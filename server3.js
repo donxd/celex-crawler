@@ -13,15 +13,22 @@ const URL_DATA_ALL = 'https://celexupiicsa.info/?s=ubicaci%C3%B3n%20-examen&feed
 const URL_DATA_LINKS = 'https://celexupiicsa.info/?s=ubicaci%C3%B3n%20-examen&feed=rss'; // links
 
 const TAG_TITLE_ITEM = 'title';
+const TAG_ELEMENT_DATA = 'item';
 
 for ( let i = 1; i <= numberRequests; i++ ){
 	makeRequest( i );
 }
 
 function getParameterNumberRequest (){
-	if (process.env.LIMIT_PAGE && !Number.isNaN(Number.parseInt(process.env.LIMIT_PAGE))) return Number.parseInt(process.env.LIMIT_PAGE);
+	if ( isValidNumber( process.env.LIMIT_PAGE ) ){
+		return Number.parseInt(process.env.LIMIT_PAGE);
+	}
 
 	return 1;
+}
+
+function isValidNumber ( content ){
+	return content && !Number.isNaN( Number.parseInt( content ) );
 }
 
 function getParamterFullProcess (){
@@ -56,7 +63,7 @@ function processXMLResponse ( content ){
 		courseList = [];
 	}
 
-	let elements = $( 'item' );
+	let elements = $( TAG_ELEMENT_DATA );
 
 	elements.each((index, element) => {
 		courseList.push( {doc: $, course: element} );
@@ -76,13 +83,13 @@ function getTitleItem ( element ){
 }
 
 function printInformation (){
-	console.log('courseList.length -> ', courseList.length);
+	console.log( 'courseList.length -> ', courseList.length );
 	if ( courseList.length > 0 ){
 
 		orderCourseList();
 
 		courseList.forEach( ( element, index ) => {
-			console.log( 'title -> %s <- [ %d ]', getTitleItem(element), index );
+			console.log( 'title -> %s <- [ %d ]', getTitleItem( element ), index );
 		});
 	}
 
