@@ -23,7 +23,7 @@ const TAG_LIST_DATA = 'tr';
 const TAG_DATA_TITLE = 'th';
 const TAG_DATA_INFO = 'td';
 
-const FORMAT_ACQUISITION = 'ddd, DD MMM YYYY HH:mm:ss +0000';
+const FORMAT_ACQUISITION = 'ddd, DD MMM YYYY HH:mm:ss +0000'; // php -> 'D, d M Y H:i:s +0000' // example => Sat, 11 Aug 2018 22:24:26 +0000
 const FORMAT_SHOW = 'YYYY-MM-DD HH:mm:ss';
 
 for ( let i = 1; i <= numberRequests; i++ ){
@@ -94,11 +94,7 @@ function getTimePublication ( element ){
 	const textTime = $( element.course ).find( TAG_PUBLICATION_ITEM ).first().text();
 	const timeFormat = moment( textTime, FORMAT_ACQUISITION ).format( FORMAT_SHOW );
 
-	// date( 'D, d M Y H:i:s +0000' )
-	// Sat, 11 Aug 2018 22:24:26 +0000
-	// moment.format('ddd, DD MMM YYYY H:mm:ss +0000')
-
-	return `${textTime} -> ${timeFormat}`;
+	return timeFormat;
 }
 
 function getTitleItem ( element ){
