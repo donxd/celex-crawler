@@ -49,9 +49,15 @@ function getUrlWithPagination ( pagination ){
 function processXMLResponse ( content ){
 	let $ = cheerio.load( content );
 
-	console.log('content request -> ', content);
+	// console.log('content request -> ', content);
 
-	// let content = $( 'h1.entry-title' );
+	let elements = $( 'item' );
+
+	elements.each((index, element) => {
+		// console.log( 'title [ %d ] # %d ', index, $(element).find('title').length );
+		console.log( 'title [ %d ] -> %s ', index, $(element).find('title').eq(0).text() );
+		
+	});
 
 	// if ( requestProcessed == 0 ){
 	// 	courseList = [];
