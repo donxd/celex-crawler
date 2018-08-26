@@ -50,17 +50,15 @@ function getUrlWithPagination ( pagination ){
 
 function processXMLResponse ( content ){
 	let $ = cheerio.load( content );
+	// console.log('content request -> ', content);
 
 	if ( requestProcessed == 0 ){
 		courseList = [];
 	}
-	// console.log('content request -> ', content);
 
 	let elements = $( 'item' );
 
 	elements.each((index, element) => {
-		// console.log( 'title [ %d ] # %d ', index, $(element).find('title').length );
-		// console.log( 'title [ %d ] -> %s ', index, $(element).find('title').eq(0).text() );
 		courseList.push( {doc: $, course: element} );
 	});
 
@@ -77,7 +75,6 @@ function getTitleItem ( element ){
 	return $( element.course ).find( TAG_TITLE_ITEM ).eq(0).text();
 }
 
-// function printInformation ( $ ){
 function printInformation (){
 	console.log('courseList.length -> ', courseList.length);
 	if ( courseList.length > 0 ){
@@ -85,7 +82,6 @@ function printInformation (){
 		orderCourseList();
 
 		courseList.forEach( ( element, index ) => {
-			// console.log( 'title -> %s ', $( element ).text() );
 			console.log( 'title -> %s <- [ %d ]', getTitleItem(element), index );
 		});
 	}
