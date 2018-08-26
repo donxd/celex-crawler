@@ -12,8 +12,9 @@ let requestProcessed = 0;
 const URL_DATA_ALL = 'https://celexupiicsa.info/?s=ubicaci%C3%B3n%20-examen&feed=rss2'; // all data
 const URL_DATA_LINKS = 'https://celexupiicsa.info/?s=ubicaci%C3%B3n%20-examen&feed=rss'; // links
 
-const TAG_TITLE_ITEM = 'title';
 const TAG_ELEMENT_DATA = 'item';
+const TAG_TITLE_ITEM = 'title';
+const TAG_TITLE_CONTENT = 'content\\:encoded';
 
 for ( let i = 1; i <= numberRequests; i++ ){
 	makeRequest( i );
@@ -56,7 +57,7 @@ function getUrlWithPagination ( pagination ){
 }
 
 function processXMLResponse ( content ){
-	let $ = cheerio.load( content );
+	let $ = cheerio.load( content, { xmlMode: true } );
 	// console.log('content request -> ', content);
 
 	if ( requestProcessed == 0 ){
@@ -79,7 +80,15 @@ function processXMLResponse ( content ){
 
 function getTitleItem ( element ){
 	const $ = element.doc;
+
 	return $( element.course ).find( TAG_TITLE_ITEM ).eq(0).text();
+}
+
+function getContentItem ( element ){
+	const $ = element.doc;
+	const content = $( element.course ).find( TAG_TITLE_CONTENT ).eq(0);
+
+	return content ? content.text() : false;
 }
 
 function printInformation (){
@@ -89,7 +98,8 @@ function printInformation (){
 		orderCourseList();
 
 		courseList.forEach( ( element, index ) => {
-			console.log( 'title -> %s <- [ %d ]', getTitleItem( element ), index );
+			const contentItem = !!getContentItem( element );
+			console.log( `title -> ${getTitleItem( element )} <- [ ${index} ] content ? ${contentItem} ` );
 		});
 	}
 
