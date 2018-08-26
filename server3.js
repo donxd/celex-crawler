@@ -111,9 +111,19 @@ function printInformation (){
 				categorizeItem( dataCourses, element );
 			}
 		});
+
+		showInformation( dataCourses );
 	}
 
 	requestProcessed = 0;
+}
+
+
+function showInformation ( dataCourses ){
+	dataCourses.forEach(course => {
+		// console.log('course -> ', JSON.stringify(course));
+		console.log(`course [ ${course.language} ][ ${course.semester} ][ ${course.level} ][ ${course.teacher} ][ ${course.schedule} ][ ${course.classroom} ] `);
+	});
 }
 
 function categorizeItem ( dataCourses, item ){
@@ -128,11 +138,11 @@ function categorizeItem ( dataCourses, item ){
 
 	itemLists.each( (index, element) => {
 		const infoCourse = getInfoCourse( $$, element );
-		console.log('course -> ', JSON.stringify(infoCourse));
+		// console.log('course -> ', JSON.stringify(infoCourse));
 		dataCourses.push( infoCourse );
 	});
 
-	return dataCourses;
+	// return dataCourses;
 }
 
 function getInfoCourse ( $, course ){
@@ -142,12 +152,12 @@ function getInfoCourse ( $, course ){
 	// console.log( `data.length -> ${data.length} `);
 
 	return {
-		language: data.eq(1).text() ? data.eq(1).text().trim() : '',
-		semester: data.eq(3).text() ? data.eq(3).text().trim() : '',
-		level: data.eq(5).text() ? data.eq(5).text().trim() : '',
-		teacher: data.eq(8).text() ? data.eq(8).text().trim() : '',
-		schedule: data.eq(10).text() ? data.eq(10).text().trim() : '',
-		classroom: data.eq(12).text() ? data.eq(12).text().trim() : '',
+		language: data.eq(1).text() ? data.eq(1).text().trim() : '-',
+		semester: data.eq(3).text() ? data.eq(3).text().trim() : '-',
+		level: data.eq(5).text() ? data.eq(5).text().trim() : '-',
+		teacher: data.eq(8).text() ? data.eq(8).text().trim() : '-',
+		schedule: data.eq(10).text() ? data.eq(10).text().trim() : '-',
+		classroom: data.eq(12).text() ? data.eq(12).text().trim() : '-',
 		// students: studentsData,
 	};
 }
