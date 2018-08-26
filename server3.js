@@ -16,6 +16,10 @@ const TAG_ELEMENT_DATA = 'item';
 const TAG_TITLE_ITEM = 'title';
 const TAG_TITLE_CONTENT = 'content\\:encoded';
 
+const TAG_LIST_COURSES = 'table';
+const TAG_LIST_DATA = 'tr';
+const TAG_DATA_INFO = 'td';
+
 for ( let i = 1; i <= numberRequests; i++ ){
 	makeRequest( i );
 }
@@ -66,7 +70,7 @@ function processXMLResponse ( content ){
 
 	let elements = $( TAG_ELEMENT_DATA );
 
-	elements.each((index, element) => {
+	elements.each( (index, element) => {
 		courseList.push( {doc: $, course: element} );
 	});
 
@@ -81,14 +85,14 @@ function processXMLResponse ( content ){
 function getTitleItem ( element ){
 	const $ = element.doc;
 
-	return $( element.course ).find( TAG_TITLE_ITEM ).eq(0).text();
+	return $( element.course ).find( TAG_TITLE_ITEM ).first().text();
 }
 
 function getContentItem ( element ){
 	const $ = element.doc;
-	const content = $( element.course ).find( TAG_TITLE_CONTENT ).eq(0);
+	const content = $( element.course ).find( TAG_TITLE_CONTENT ).first();
 
-	return content ? content.text() : false;
+	return content ? content : false;
 }
 
 function printInformation (){
@@ -96,14 +100,62 @@ function printInformation (){
 	if ( courseList.length > 0 ){
 
 		orderCourseList();
+		const dataCourses = [];
 
 		courseList.forEach( ( element, index ) => {
-			const contentItem = !!getContentItem( element );
-			console.log( `title -> ${getTitleItem( element )} <- [ ${index} ] content ? ${contentItem} ` );
+			const hasContentItem = !!getContentItem( element );
+			console.log( `title -> ${getTitleItem( element )} <- [ ${index} ] content ? ${hasContentItem} ` );
+
+			if ( !!hasContentItem ){
+				// console.log( `couse[ ${index} ]`);
+				categorizeItem( dataCourses, element );
+			}
 		});
 	}
 
 	requestProcessed = 0;
+}
+
+function categorizeItem ( dataCourses, item ){
+	// const $ = item.doc;
+	const contentItem = getContentItem( item ).text();
+	// const itemLists = $( contentItem ).find( TAG_LIST_COURSES );
+
+	const $$ = cheerio.load( contentItem, { xmlMode: true } );
+	const itemLists = $$( TAG_LIST_COURSES );
+
+	// console.log( 'item.type -> ', item.course.tagName );
+	// console.log( 'item.title.text() -> ', $( item.course ).find( TAG_TITLE_CONTENT ).first().text() );
+	console.log( `item[ courses ] # ${itemLists.length}`);
+
+	// const courses = [];
+
+	// itemLists.each( (index, element) => {
+	// 	console.log( `item[ ${index} ]`);
+	// 	const infoCourse = getInfoCourse( $, element );
+	// });
+
+	return dataCourses;
+}
+
+function getInfoCourse ( $, course ){
+	const data = $( course ).find( TAG_LIST_DATA ).eq( 0 );
+
+	const cells = $( data ).find( TAG_DATA_INFO );
+
+	cells.each( (index, element) => {
+		console.log( `cell [ ${index} ] -> ${element.text()} `);
+	});
+
+	return {
+		// language: tableHead.eq(1).text(),
+		// semester: tableHead.eq(3).text(),
+		// level: tableHead.eq(5).text(),
+		// teacher: tableHead.eq(8).text(),
+		// schedule: tableHead.eq(10).text(),
+		// classroom: tableHead.eq(12).text(),
+		// students: studentsData,
+	};
 }
 
 function orderCourseList (){
