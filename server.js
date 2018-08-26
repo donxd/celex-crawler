@@ -18,9 +18,10 @@ var j = schedule.scheduleJob( '*/5 * * * * *', function (){
 });
 
 function makeRequest ( pagination ){
-	console.log( 'mensaje - realizando petición [ %d ] ', pagination );
+	// console.log( 'mensaje - realizando petición [ %d ] ', pagination );
 
 	var urlPagination = getUrlWithPagination( pagination );
+	console.log( 'mensaje - realizando petición [ %s ] ', urlPagination );
 
 	request( urlPagination, function( error, response, body ){
 		processBodyResponse( body );
