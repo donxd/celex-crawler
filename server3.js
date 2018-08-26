@@ -122,7 +122,7 @@ function printInformation (){
 function showInformation ( dataCourses ){
 	dataCourses.forEach(course => {
 		// console.log('course -> ', JSON.stringify(course));
-		console.log(`course [ ${course.language} ][ ${course.semester} ][ ${course.level} ][ ${course.teacher} ][ ${course.schedule} ][ ${course.classroom} ] `);
+		console.log(`course [ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ] `);
 	});
 }
 
