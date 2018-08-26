@@ -1,7 +1,7 @@
 const cheerio = require( 'cheerio' );
 const moment = require( 'moment' );
 const request = require( 'request' );
-const schedule = require( 'node-schedule' );
+// const schedule = require( 'node-schedule' );
 
 let fullProcess = getParamterFullProcess();
 let numberRequests = getParameterNumberRequest();
@@ -16,11 +16,15 @@ const URL_DATA_LINKS = 'https://celexupiicsa.info/?s=ubicaci%C3%B3n%20-examen&fe
 const TAG_ELEMENT_DATA = 'item';
 const TAG_TITLE_ITEM = 'title';
 const TAG_TITLE_CONTENT = 'content\\:encoded';
+const TAG_PUBLICATION_ITEM = 'pubDate';
 
 const TAG_LIST_COURSES = 'table';
 const TAG_LIST_DATA = 'tr';
 const TAG_DATA_TITLE = 'th';
 const TAG_DATA_INFO = 'td';
+
+const FORMAT_ACQUISITION = 'ddd, DD MMM YYYY HH:mm:ss +0000';
+const FORMAT_SHOW = 'YYYY-MM-DD HH:mm:ss';
 
 for ( let i = 1; i <= numberRequests; i++ ){
 	makeRequest( i );
@@ -84,6 +88,19 @@ function processXMLResponse ( content ){
 	}
 }
 
+function getTimePublication ( element ){
+	const $ = element.doc;
+
+	const textTime = $( element.course ).find( TAG_PUBLICATION_ITEM ).first().text();
+	const timeFormat = moment( textTime, FORMAT_ACQUISITION ).format( FORMAT_SHOW );
+
+	// date( 'D, d M Y H:i:s +0000' )
+	// Sat, 11 Aug 2018 22:24:26 +0000
+	// moment.format('ddd, DD MMM YYYY H:mm:ss +0000')
+
+	return `${textTime} -> ${timeFormat}`;
+}
+
 function getTitleItem ( element ){
 	const $ = element.doc;
 
@@ -106,7 +123,8 @@ function printInformation (){
 
 		courseList.forEach( ( element, index ) => {
 			const hasContentItem = !!getContentItem( element );
-			console.log( `title -> ${getTitleItem( element )} <- [ ${index} ] content ? ${hasContentItem} ` );
+			const publicationTime = getTimePublication( element );
+			console.log( `title -> ${getTitleItem( element )} <- [ ${index} ] [ ${publicationTime} ] content ? ${hasContentItem} ` );
 
 			if ( !!hasContentItem ){
 				categorizeItem( dataCourses, element );
