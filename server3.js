@@ -18,6 +18,7 @@ const TAG_TITLE_CONTENT = 'content\\:encoded';
 
 const TAG_LIST_COURSES = 'table';
 const TAG_LIST_DATA = 'tr';
+const TAG_DATA_TITLE = 'th';
 const TAG_DATA_INFO = 'td';
 
 for ( let i = 1; i <= numberRequests; i++ ){
@@ -99,7 +100,7 @@ function printInformation (){
 	console.log( 'courseList.length -> ', courseList.length );
 	if ( courseList.length > 0 ){
 
-		orderCourseList();
+		// orderCourseList();
 		const dataCourses = [];
 
 		courseList.forEach( ( element, index ) => {
@@ -123,32 +124,30 @@ function categorizeItem ( dataCourses, item ){
 
 	console.log( `item[ courses ] # ${itemLists.length}`);
 
-	// const courses = [];
+	const courses = [];
 
-	// itemLists.each( (index, element) => {
-	// 	console.log( `item[ ${index} ]`);
-	// 	const infoCourse = getInfoCourse( $, element );
-	// });
+	itemLists.each( (index, element) => {
+		const infoCourse = getInfoCourse( $$, element );
+		console.log('course -> ', JSON.stringify(infoCourse));
+		dataCourses.push( infoCourse );
+	});
 
 	return dataCourses;
 }
 
 function getInfoCourse ( $, course ){
-	const data = $( course ).find( TAG_LIST_DATA ).eq( 0 );
+	const data = $( course ).find( TAG_DATA_TITLE );
 
-	const cells = $( data ).find( TAG_DATA_INFO );
-
-	cells.each( (index, element) => {
-		console.log( `cell [ ${index} ] -> ${element.text()} `);
-	});
+	// console.log( `course.tagName -> ${course.tagName} `);
+	// console.log( `data.length -> ${data.length} `);
 
 	return {
-		// language: tableHead.eq(1).text(),
-		// semester: tableHead.eq(3).text(),
-		// level: tableHead.eq(5).text(),
-		// teacher: tableHead.eq(8).text(),
-		// schedule: tableHead.eq(10).text(),
-		// classroom: tableHead.eq(12).text(),
+		language: data.eq(1).text() ? data.eq(1).text().trim() : '',
+		semester: data.eq(3).text() ? data.eq(3).text().trim() : '',
+		level: data.eq(5).text() ? data.eq(5).text().trim() : '',
+		teacher: data.eq(8).text() ? data.eq(8).text().trim() : '',
+		schedule: data.eq(10).text() ? data.eq(10).text().trim() : '',
+		classroom: data.eq(12).text() ? data.eq(12).text().trim() : '',
 		// students: studentsData,
 	};
 }
