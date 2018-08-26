@@ -107,7 +107,6 @@ function printInformation (){
 			console.log( `title -> ${getTitleItem( element )} <- [ ${index} ] content ? ${hasContentItem} ` );
 
 			if ( !!hasContentItem ){
-				// console.log( `couse[ ${index} ]`);
 				categorizeItem( dataCourses, element );
 			}
 		});
@@ -117,15 +116,11 @@ function printInformation (){
 }
 
 function categorizeItem ( dataCourses, item ){
-	// const $ = item.doc;
 	const contentItem = getContentItem( item ).text();
-	// const itemLists = $( contentItem ).find( TAG_LIST_COURSES );
 
 	const $$ = cheerio.load( contentItem, { xmlMode: true } );
 	const itemLists = $$( TAG_LIST_COURSES );
 
-	// console.log( 'item.type -> ', item.course.tagName );
-	// console.log( 'item.title.text() -> ', $( item.course ).find( TAG_TITLE_CONTENT ).first().text() );
 	console.log( `item[ courses ] # ${itemLists.length}`);
 
 	// const courses = [];
