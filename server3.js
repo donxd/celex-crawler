@@ -12,6 +12,8 @@ let requestProcessed = 0;
 const URL_DATA_ALL = 'https://celexupiicsa.info/?s=ubicaci%C3%B3n%20-examen&feed=rss2'; // all data
 const URL_DATA_LINKS = 'https://celexupiicsa.info/?s=ubicaci%C3%B3n%20-examen&feed=rss'; // links
 
+const TAG_TITLE_ITEM = 'title';
+
 for ( let i = 1; i <= numberRequests; i++ ){
 	makeRequest( i );
 }
@@ -49,62 +51,62 @@ function getUrlWithPagination ( pagination ){
 function processXMLResponse ( content ){
 	let $ = cheerio.load( content );
 
+	if ( requestProcessed == 0 ){
+		courseList = [];
+	}
 	// console.log('content request -> ', content);
 
 	let elements = $( 'item' );
 
 	elements.each((index, element) => {
 		// console.log( 'title [ %d ] # %d ', index, $(element).find('title').length );
-		console.log( 'title [ %d ] -> %s ', index, $(element).find('title').eq(0).text() );
-		
+		// console.log( 'title [ %d ] -> %s ', index, $(element).find('title').eq(0).text() );
+		courseList.push( {doc: $, course: element} );
 	});
 
-	// if ( requestProcessed == 0 ){
-	// 	courseList = [];
-	// }
 
-	// content.each( ( index, element ) => {
-	// 	// console.log( 'title [ %d ] -> %s ', index, $(element).text() );
+	requestProcessed++;
 
-	// 	if ( $( element ).text().indexOf( 'Listas de cursos de ') != -1 ){
-	// 		courseList.push( $( element ) );
-	// 	}
-
-	// });
-
-	// requestProcessed++;
-
-	// if ( requestProcessed == numberRequests ){
-	// 	printInformation( $ );
-	// }
-
+	if ( requestProcessed === numberRequests ){
+		printInformation();
+	}
 }
 
-function printInformation ( $ ){
+function getTitleItem ( element ){
+	const $ = element.doc;
+	return $( element.course ).find( TAG_TITLE_ITEM ).eq(0).text();
+}
 
+// function printInformation ( $ ){
+function printInformation (){
+	console.log('courseList.length -> ', courseList.length);
 	if ( courseList.length > 0 ){
 
-		courseList.sort( ( a, b ) => {
-
-			if ( $( a ).text() < $( b ).text() ){
-				return -1;
-			}
-
-			if ( $( a ).text() > $( b ).text() ){
-				return 1;
-			}
-
-			return 0;
-		});
+		orderCourseList();
 
 		courseList.forEach( ( element, index ) => {
 			// console.log( 'title -> %s ', $( element ).text() );
-			console.log( 'title -> %s <- [ %d ]', $(element).text(), index );
+			console.log( 'title -> %s <- [ %d ]', getTitleItem(element), index );
 		});
 	}
 
-	// if ( requestProcessed == numberRequests ){
-		requestProcessed = 0;
-	// }
+	requestProcessed = 0;
+}
 
+function orderCourseList (){
+	courseList.sort( ( a, b ) => {
+
+		const titleA = getTitleItem(a);
+		const titleB = getTitleItem(b);
+
+		if ( titleA < titleB ){
+			return -1;
+		}
+
+		if ( titleA > titleB ){
+			return 1;
+		}
+
+		return 0;
+	});
 }
