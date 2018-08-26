@@ -1,9 +1,10 @@
-let schedule = require( 'node-schedule' );
-let request = require( 'request' );
-let cheerio = require( 'cheerio' );
+const cheerio = require( 'cheerio' );
+const moment = require( 'moment' );
+const request = require( 'request' );
+const schedule = require( 'node-schedule' );
 
-let numberRequests = getParameterNumberRequest();
 let fullProcess = getParamterFullProcess();
+let numberRequests = getParameterNumberRequest();
 
 let courseList = [];
 let requestProcessed = 0;
@@ -132,7 +133,7 @@ function categorizeItem ( dataCourses, item ){
 	const $$ = cheerio.load( contentItem, { xmlMode: true } );
 	const itemLists = $$( TAG_LIST_COURSES );
 
-	console.log( `item[ courses ] # ${itemLists.length}`);
+	// console.log( `item[ courses ] # ${itemLists.length}`);
 
 	const courses = [];
 
