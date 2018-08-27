@@ -1,4 +1,6 @@
 const cheerio = require( 'cheerio' );
+const iconv = require( 'iconv' );
+const iconvLite = require('iconv-lite');
 const moment = require( 'moment' );
 const request = require( 'request' );
 // const schedule = require( 'node-schedule' );
@@ -20,8 +22,8 @@ const TAG_CONTENT_ITEM = 'content\\:encoded';
 const TAG_PUBLICATION_ITEM = 'pubDate';
 
 const TAG_LIST_COURSES = 'table';
-const TAG_LIST_DATA = 'tr';
 const TAG_DATA_TITLE = 'th';
+const TAG_LIST_DATA = 'tr';
 const TAG_DATA_INFO = 'td';
 
 const FORMAT_ACQUISITION = 'ddd, DD MMM YYYY HH:mm:ss +0000'; // php -> 'D, d M Y H:i:s +0000' // example => Sat, 11 Aug 2018 22:24:26 +0000
@@ -54,6 +56,9 @@ function makeRequest ( pagination ){
 	console.log( 'mensaje - realizando petición [ %s ] ', urlPagination );
 
 	request( urlPagination, ( error, response, content ) => {
+		// content = iconvLite.decode( content, 'ISO-8859-1' );
+		// content = toUTF8( content );
+
 		processXMLResponse( content );
 	});
 }
@@ -68,6 +73,7 @@ function getUrlWithPagination ( pagination ){
 }
 
 function processXMLResponse ( content ){
+	// let $ = cheerio.load( content, { xmlMode: true, decodeEntities: true } );
 	let $ = cheerio.load( content, { xmlMode: true } );
 	// console.log('content request -> ', content);
 
@@ -147,12 +153,19 @@ function showInformation ( dataCourses ){
 	dataCourses.forEach(course => {
 		// console.log('course -> ', JSON.stringify(course));
 		console.log(`course [ ${course.publication} ][ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ] `);
+		course.students.forEach(student => {
+			console.log( `student -> ${student} `);
+		});
 	});
 }
 
 function classifyItem ( dataCourses, item, linkItem, publicationTimeItem, titleItem ){
-	const contentItem = getContentItem( item ).text();
+	let contentItem = getContentItem( item ).text();
 
+	// contentItem = iconvLite.decode( contentItem, 'ISO-8859-1' );
+	// contentItem = toUTF8( contentItem );
+
+	// const $$ = cheerio.load( contentItem, { xmlMode: true, decodeEntities: true } );
 	const $$ = cheerio.load( contentItem, { xmlMode: true } );
 	const itemLists = $$( TAG_LIST_COURSES );
 
@@ -168,6 +181,7 @@ function classifyItem ( dataCourses, item, linkItem, publicationTimeItem, titleI
 
 function getInfoCourse ( $, course, linkItem, publicationTimeItem, titleItem ){
 	const data = $( course ).find( TAG_DATA_TITLE );
+	const studentsData = getStudentsData( $, course );
 
 	return {
 		language: data.eq(1).text() ? data.eq(1).text().trim() : '-',
@@ -179,8 +193,22 @@ function getInfoCourse ( $, course, linkItem, publicationTimeItem, titleItem ){
 		link : linkItem,
 		publication : publicationTimeItem,
 		title : titleItem,
-		// students: studentsData,
+		students: studentsData,
 	};
+}
+
+function getStudentsData ( $, course ){
+	const students = [];
+
+	$( course ).find( TAG_LIST_DATA ).each( ( index, student ) => {
+		if ( index > 3 ){
+			const dataStudent = $( student ).find( TAG_DATA_INFO ).eq( 1 ).text();
+
+			students.push( dataStudent );
+		}
+	});
+
+	return students;
 }
 
 function orderCourseList (){
@@ -199,4 +227,12 @@ function orderCourseList (){
 
 		return 0;
 	});
+}
+
+function toUTF8 ( body ){
+  // convert from iso-8859-1 to utf-8
+  var ic = new iconv.Iconv( 'iso-8859-1', 'utf-8' );
+  var buf = ic.convert( body );
+
+  return buf.toString('utf-8');
 }
