@@ -15,6 +15,7 @@ const URL_DATA_LINKS = 'https://celexupiicsa.info/?s=ubicaci%C3%B3n%20-examen&fe
 
 const TAG_ELEMENT_DATA = 'item';
 const TAG_TITLE_ITEM = 'title';
+const TAG_LINK_ITEM = 'link';
 const TAG_CONTENT_ITEM = 'content\\:encoded';
 const TAG_PUBLICATION_ITEM = 'pubDate';
 
@@ -88,7 +89,7 @@ function processXMLResponse ( content ){
 	}
 }
 
-function getTimePublication ( element ){
+function getTimePublicationItem ( element ){
 	const textTime = getComponentItem( TAG_PUBLICATION_ITEM, element ).text();
 	const timeFormat = moment( textTime, FORMAT_ACQUISITION ).format( FORMAT_SHOW );
 
@@ -97,6 +98,10 @@ function getTimePublication ( element ){
 
 function getTitleItem ( element ){
 	return getComponentItem( TAG_TITLE_ITEM, element ).text();
+}
+
+function getLinkItem ( element ){
+	return getComponentItem( TAG_LINK_ITEM, element ).text();
 }
 
 function getContentItem ( element ){
@@ -119,11 +124,15 @@ function printInformation (){
 
 		courseList.forEach( ( element, index ) => {
 			const hasContentItem = !!getContentItem( element );
-			const publicationTime = getTimePublication( element );
-			console.log( `[ ${publicationTime} ] title [ ${getTitleItem( element )} ] [ ${index} ] content ? ${hasContentItem} ` );
+
+			const linkItem = getLinkItem( element );
+			const publicationTimeItem = getTimePublicationItem( element );
+			const titleItem = getTitleItem( element );
+
+			console.log( `[ ${publicationTimeItem} ] title [ ${titleItem} ] [ ${index} ] content ? ${hasContentItem} ` );
 
 			if ( !!hasContentItem ){
-				classifyItem( dataCourses, element );
+				classifyItem( dataCourses, element, linkItem, publicationTimeItem, titleItem );
 			}
 		});
 
@@ -137,11 +146,11 @@ function printInformation (){
 function showInformation ( dataCourses ){
 	dataCourses.forEach(course => {
 		// console.log('course -> ', JSON.stringify(course));
-		console.log(`course [ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ] `);
+		console.log(`course [ ${course.publication} ][ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ] `);
 	});
 }
 
-function classifyItem ( dataCourses, item ){
+function classifyItem ( dataCourses, item, linkItem, publicationTimeItem, titleItem ){
 	const contentItem = getContentItem( item ).text();
 
 	const $$ = cheerio.load( contentItem, { xmlMode: true } );
@@ -152,7 +161,7 @@ function classifyItem ( dataCourses, item ){
 	const courses = [];
 
 	itemLists.each( (index, element) => {
-		const infoCourse = getInfoCourse( $$, element );
+		const infoCourse = getInfoCourse( $$, element, linkItem, publicationTimeItem, titleItem );
 		// console.log('course -> ', JSON.stringify(infoCourse));
 		dataCourses.push( infoCourse );
 	});
@@ -160,7 +169,7 @@ function classifyItem ( dataCourses, item ){
 	// return dataCourses;
 }
 
-function getInfoCourse ( $, course ){
+function getInfoCourse ( $, course, linkItem, publicationTimeItem, titleItem ){
 	const data = $( course ).find( TAG_DATA_TITLE );
 
 	// console.log( `course.tagName -> ${course.tagName} `);
@@ -173,6 +182,9 @@ function getInfoCourse ( $, course ){
 		teacher: data.eq(8).text() ? data.eq(8).text().trim() : '-',
 		schedule: data.eq(10).text() ? data.eq(10).text().trim() : '-',
 		classroom: data.eq(12).text() ? data.eq(12).text().trim() : '-',
+		link : linkItem,
+		publication : publicationTimeItem,
+		title : titleItem,
 		// students: studentsData,
 	};
 }
