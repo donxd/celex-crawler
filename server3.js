@@ -15,7 +15,7 @@ const URL_DATA_LINKS = 'https://celexupiicsa.info/?s=ubicaci%C3%B3n%20-examen&fe
 
 const TAG_ELEMENT_DATA = 'item';
 const TAG_TITLE_ITEM = 'title';
-const TAG_TITLE_CONTENT = 'content\\:encoded';
+const TAG_CONTENT_ITEM = 'content\\:encoded';
 const TAG_PUBLICATION_ITEM = 'pubDate';
 
 const TAG_LIST_COURSES = 'table';
@@ -89,23 +89,23 @@ function processXMLResponse ( content ){
 }
 
 function getTimePublication ( element ){
-	const $ = element.doc;
-
-	const textTime = $( element.course ).find( TAG_PUBLICATION_ITEM ).first().text();
+	const textTime = getComponentItem( TAG_PUBLICATION_ITEM, element ).text();
 	const timeFormat = moment( textTime, FORMAT_ACQUISITION ).format( FORMAT_SHOW );
 
 	return timeFormat;
 }
 
 function getTitleItem ( element ){
-	const $ = element.doc;
-
-	return $( element.course ).find( TAG_TITLE_ITEM ).first().text();
+	return getComponentItem( TAG_TITLE_ITEM, element ).text();
 }
 
 function getContentItem ( element ){
+	return getComponentItem( TAG_CONTENT_ITEM, element );
+}
+
+function getComponentItem ( component, element ){
 	const $ = element.doc;
-	const content = $( element.course ).find( TAG_TITLE_CONTENT ).first();
+	const content = $( element.course ).find( component ).first();
 
 	return content ? content : false;
 }
@@ -123,7 +123,7 @@ function printInformation (){
 			console.log( `[ ${publicationTime} ] title [ ${getTitleItem( element )} ] [ ${index} ] content ? ${hasContentItem} ` );
 
 			if ( !!hasContentItem ){
-				categorizeItem( dataCourses, element );
+				classifyItem( dataCourses, element );
 			}
 		});
 
@@ -141,7 +141,7 @@ function showInformation ( dataCourses ){
 	});
 }
 
-function categorizeItem ( dataCourses, item ){
+function classifyItem ( dataCourses, item ){
 	const contentItem = getContentItem( item ).text();
 
 	const $$ = cheerio.load( contentItem, { xmlMode: true } );
