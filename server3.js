@@ -120,7 +120,7 @@ function printInformation (){
 		courseList.forEach( ( element, index ) => {
 			const hasContentItem = !!getContentItem( element );
 			const publicationTime = getTimePublication( element );
-			console.log( `title -> ${getTitleItem( element )} <- [ ${index} ] [ ${publicationTime} ] content ? ${hasContentItem} ` );
+			console.log( `[ ${publicationTime} ] title [ ${getTitleItem( element )} ] [ ${index} ] content ? ${hasContentItem} ` );
 
 			if ( !!hasContentItem ){
 				categorizeItem( dataCourses, element );
