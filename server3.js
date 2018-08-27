@@ -162,18 +162,12 @@ function classifyItem ( dataCourses, item, linkItem, publicationTimeItem, titleI
 
 	itemLists.each( (index, element) => {
 		const infoCourse = getInfoCourse( $$, element, linkItem, publicationTimeItem, titleItem );
-		// console.log('course -> ', JSON.stringify(infoCourse));
 		dataCourses.push( infoCourse );
 	});
-
-	// return dataCourses;
 }
 
 function getInfoCourse ( $, course, linkItem, publicationTimeItem, titleItem ){
 	const data = $( course ).find( TAG_DATA_TITLE );
-
-	// console.log( `course.tagName -> ${course.tagName} `);
-	// console.log( `data.length -> ${data.length} `);
 
 	return {
 		language: data.eq(1).text() ? data.eq(1).text().trim() : '-',
