@@ -56,6 +56,7 @@ function makeRequest ( pagination ){
 	console.log( 'mensaje - realizando petición [ %s ] ', urlPagination );
 
 	request( urlPagination, ( error, response, content ) => {
+		// content = iconvLite.decode( content, 'utf-8' );
 		// content = iconvLite.decode( content, 'ISO-8859-1' );
 		// content = toUTF8( content );
 
@@ -73,8 +74,9 @@ function getUrlWithPagination ( pagination ){
 }
 
 function processXMLResponse ( content ){
+	let $ = cheerio.load( content, { xmlMode: true, decodeEntities: false } );
 	// let $ = cheerio.load( content, { xmlMode: true, decodeEntities: true } );
-	let $ = cheerio.load( content, { xmlMode: true } );
+	// let $ = cheerio.load( content, { xmlMode: true } );
 	// console.log('content request -> ', content);
 
 	if ( requestProcessed == 0 ){
@@ -162,11 +164,13 @@ function showInformation ( dataCourses ){
 function classifyItem ( dataCourses, item, linkItem, publicationTimeItem, titleItem ){
 	let contentItem = getContentItem( item ).text();
 
+	// contentItem = iconvLite.decode( contentItem, 'utf-8' );
 	// contentItem = iconvLite.decode( contentItem, 'ISO-8859-1' );
 	// contentItem = toUTF8( contentItem );
 
+	const $$ = cheerio.load( contentItem, { xmlMode: true, decodeEntities: false } );
 	// const $$ = cheerio.load( contentItem, { xmlMode: true, decodeEntities: true } );
-	const $$ = cheerio.load( contentItem, { xmlMode: true } );
+	// const $$ = cheerio.load( contentItem, { xmlMode: true } );
 	const itemLists = $$( TAG_LIST_COURSES );
 
 	// console.log( `item[ courses ] # ${itemLists.length}`);
@@ -202,7 +206,14 @@ function getStudentsData ( $, course ){
 
 	$( course ).find( TAG_LIST_DATA ).each( ( index, student ) => {
 		if ( index > 3 ){
-			const dataStudent = $( student ).find( TAG_DATA_INFO ).eq( 1 ).text();
+
+			let dataStudent = $( student ).find( TAG_DATA_INFO ).eq( 1 ).text();
+			// dataStudent = toUTF8( dataStudent );
+			const characters = new RegExp( /[Ã]/, 'g' );
+			if ( characters.test( dataStudent ) ){
+				dataStudent = iconvLite.decode( dataStudent, 'utf-8' );
+			}
+			// dataStudent = iconvLite.decode( dataStudent, 'ISO-8859-1' );
 
 			students.push( dataStudent );
 		}
@@ -229,10 +240,10 @@ function orderCourseList (){
 	});
 }
 
-function toUTF8 ( body ){
-  // convert from iso-8859-1 to utf-8
-  var ic = new iconv.Iconv( 'iso-8859-1', 'utf-8' );
-  var buf = ic.convert( body );
+// function toUTF8 ( body ){
+//   // convert from iso-8859-1 to utf-8
+//   var ic = new iconv.Iconv( 'iso-8859-1', 'utf-8' );
+//   var buf = ic.convert( body );
 
-  return buf.toString('utf-8');
-}
+//   return buf.toString('utf-8');
+// }
