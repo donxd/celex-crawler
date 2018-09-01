@@ -231,9 +231,6 @@ function getStudentsData ( $, course ){
 				students.push( dataStudent );
 			}
 		});
-		// console.log(`course -> ${$( course ).html()} `);
-		// console.log('$( course ).find( TAG_LIST_DATA ) -> ', $( course ).find( TAG_LIST_DATA ).length);
-		// console.log('$( course ).find( TAG_LIST_DATA ) -> ', $( course ).find( TAG_LIST_DATA ).length);
 	}
 
 	return students;
