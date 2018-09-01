@@ -154,10 +154,10 @@ function printInformation (){
 function showInformation ( dataCourses ){
 	dataCourses.forEach(course => {
 		// console.log('course -> ', JSON.stringify(course));
-		console.log(`course [ ${course.publication} ][ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ] `);
-		course.students.forEach(student => {
-			console.log( `student -> ${student} `);
-		});
+		console.log(`course [ ${course.publication} ][ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ][ s: ${course.students.length} ] `);
+		// course.students.forEach(student => {
+		// 	console.log( `student -> ${student} `);
+		// });
 	});
 }
 
@@ -218,6 +218,23 @@ function getStudentsData ( $, course ){
 			students.push( dataStudent );
 		}
 	});
+
+	if ( !students.length ) {
+		$( course ).find( TAG_DATA_INFO ).each( ( index, student ) => {
+			if ( index % 2 ){
+				let dataStudent = $( student ).text();
+				const characters = new RegExp( /[Ã]/, 'g' );
+				if ( characters.test( dataStudent ) ){
+					dataStudent = iconvLite.decode( dataStudent, 'utf-8' );
+				}
+
+				students.push( dataStudent );
+			}
+		});
+		// console.log(`course -> ${$( course ).html()} `);
+		// console.log('$( course ).find( TAG_LIST_DATA ) -> ', $( course ).find( TAG_LIST_DATA ).length);
+		// console.log('$( course ).find( TAG_LIST_DATA ) -> ', $( course ).find( TAG_LIST_DATA ).length);
+	}
 
 	return students;
 }
