@@ -144,6 +144,8 @@ function printInformation (){
 			}
 		});
 
+		// showInformation( dataCourses );
+		organizeInformation( dataCourses );
 		showInformation( dataCourses );
 	}
 
@@ -251,6 +253,22 @@ function orderCourseList (){
 		}
 
 		return 0;
+	});
+}
+
+function organizeInformation ( dataCourses ){
+	sortOrderCourses( dataCourses );
+}
+
+function sortOrderCourses ( dataCourses ){
+	dataCourses.sort( ( a, b ) => {
+		const textA = `c[ ${a.language} ][ ${a.level} ][ ${a.schedule} ][ ${a.publication} ]`;
+		const textB = `c[ ${b.language} ][ ${b.level} ][ ${b.schedule} ][ ${b.publication} ]`;
+
+		if ( textA === textB ) return 0;
+		if ( textA > textB ) return 1;
+
+		return -1;
 	});
 }
 
