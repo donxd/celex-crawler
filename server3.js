@@ -29,6 +29,8 @@ const TAG_DATA_INFO = 'td';
 const FORMAT_ACQUISITION = 'ddd, DD MMM YYYY HH:mm:ss +0000'; // php -> 'D, d M Y H:i:s +0000' // example => Sat, 11 Aug 2018 22:24:26 +0000
 const FORMAT_SHOW = 'YYYY-MM-DD HH:mm:ss';
 
+const FLAG_PARAMETER_YES = 'y';
+
 for ( let i = 1; i <= numberRequests; i++ ){
 	makeRequest( i );
 }
@@ -46,7 +48,7 @@ function isValidNumber ( content ){
 }
 
 function getParamterFullProcess (){
-	if (process.env.FULL_PROCESS) return process.env.FULL_PROCESS === 'y';
+	if (process.env.FULL_PROCESS) return process.env.FULL_PROCESS === FLAG_PARAMETER_YES;
 
 	return true;
 }
