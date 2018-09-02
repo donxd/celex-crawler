@@ -279,12 +279,12 @@ function organizeInformation ( dataCourses ){
 	const cancelledCourses = getCancelledCourses( courses );
 }
 
-function getActiveCourses ( course ){
-	return course;
+function getActiveCourses ( courses ){
+	return courses;
 }
 
-function getCancelledCourses ( course ){
-	return course;
+function getCancelledCourses ( courses ){
+	return courses;
 }
 
 
