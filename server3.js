@@ -286,8 +286,8 @@ function organizeInformation ( dataCourses ){
 
 	const classifiedCancelledCoursesByLanguage = classifiedCoursesByLanguage( cancelledCourses );
 
-	classifiedCancelledCoursesByLanguage.forEach( cancelledCourse => {
-		console.log(`course [ -CANCELLED- ][ ${cancelledCourse.language} ] `);
+	classifiedCancelledCoursesByLanguage.forEach( cancelledCourseByLanguage => {
+		console.log(`course [ -CANCELLED- ][ ${cancelledCourseByLanguage.language} ][ ${cancelledCourseByLanguage.courses.length} ]`);
 	});
 }
 
