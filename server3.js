@@ -325,7 +325,17 @@ function classifyCoursesByLanguage ( courses ){
 }
 
 function classifyLanguageCoursesBySchedule ( languageCourses ){
-	return languageCourses;
+	const courses = cloneArrayData( languageCourses );
+
+	courses.forEach( languageCourse => {
+		languageCourse.schedules = classifyCourseBySchedule( languageCourse.courses );
+	});
+
+	return courses;
+}
+
+function classifyCourseBySchedule ( courses ){
+	return courses;
 }
 
 function listCoursesHas ( courses, courseLanguage ){
