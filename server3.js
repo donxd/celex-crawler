@@ -290,13 +290,8 @@ function organizeInformation ( dataCourses ){
 	const activeLanguageCourses = classifyCoursesByLanguage( activeCourses );
 	const cancelledLanguageCourses = classifyCoursesByLanguage( cancelledCourses );
 
-	activeLanguageCourses.forEach( activeCourseByLanguage => {
-		console.log(`course l [ -ACTIVE- ][ ${activeCourseByLanguage.language} ][ ${activeCourseByLanguage.courses.length} ]`);
-	});
-
-	cancelledLanguageCourses.forEach( cancelledCourseByLanguage => {
-		console.log(`course l [ -CANCELLED- ][ ${cancelledCourseByLanguage.language} ][ ${cancelledCourseByLanguage.courses.length} ]`);
-	});
+	showDataCourseLanguage( activeLanguageCourses, true );
+	showDataCourseLanguage( cancelledLanguageCourses, false );
 
 	const activeLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( activeLanguageCourses );
 	const cancelledLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( cancelledLanguageCourses );
@@ -350,6 +345,14 @@ function addLanguage ( acc, course ){
 	acc.push({
 		language: course.language,
 		courses: [ course ],
+	});
+}
+
+function showDataCourseLanguage ( languageCourses, activeFlag ){
+	const flag = activeFlag ? ACTIVE_COURSE : CANCELLED_COURSE;
+
+	languageCourses.forEach( courseByLanguage => {
+		console.log(`course l [ -${flag}- ][ ${courseByLanguage.language} ][ ${courseByLanguage.courses.length} ]`);
 	});
 }
 
