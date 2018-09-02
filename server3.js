@@ -262,14 +262,18 @@ function organizeInformation ( dataCourses ){
 
 function sortOrderCourses ( dataCourses ){
 	dataCourses.sort( ( a, b ) => {
-		const textA = `c[ ${a.language} ][ ${a.level} ][ ${a.schedule} ][ ${a.publication} ]`;
-		const textB = `c[ ${b.language} ][ ${b.level} ][ ${b.schedule} ][ ${b.publication} ]`;
+		const textA = courseToStringOrder( a );
+		const textB = courseToStringOrder( b );
 
 		if ( textA === textB ) return 0;
 		if ( textA > textB ) return 1;
 
 		return -1;
 	});
+}
+
+function courseToStringOrder ( course ){
+	return `c[ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.publication} ]`;
 }
 
 // function toUTF8 ( body ){
