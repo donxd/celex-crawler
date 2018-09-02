@@ -284,9 +284,9 @@ function organizeInformation ( dataCourses ){
 	console.log( 'activeCourses.length -> ', activeCourses.length );
 	console.log( 'cancelledCourses.length -> ', cancelledCourses.length );
 
-	const classifiedCancelledCourses = classifiedCourses( cancelledCourses );
+	const classifiedCancelledCoursesByLanguage = classifiedCoursesByLanguage( cancelledCourses );
 
-	classifiedCancelledCourses.forEach( cancelledCourse => {
+	classifiedCancelledCoursesByLanguage.forEach( cancelledCourse => {
 		console.log(`course [ -CANCELLED- ][ ${cancelledCourse.language} ] `);
 	});
 }
@@ -299,7 +299,7 @@ function getCancelledCourses ( courses ){
 	return courses.filter( course => course.teacher === CANCEL_COURSE_TEXT );
 }
 
-function classifiedCourses ( courses ){
+function classifiedCoursesByLanguage ( courses ){
 	return courses.reduce( ( acc, course ) => {
 		const positionCourse = listCoursesHas( acc, course );
 		if ( positionCourse.length ){
