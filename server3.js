@@ -299,7 +299,15 @@ function organizeInformation ( dataCourses ){
 	const cancelledLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( cancelledLanguageCourses );
 
 	activeLanguageCoursesSchedule.forEach( activeCourseByLanguage => {
-		console.log(`course ls [ -ACTIVE- ][ ${activeCourseByLanguage.language} ][ ${activeCourseByLanguage.courses.length} ]`);
+		activeCourseByLanguage.schedules.forEach( activeCourseBySchedule => {
+			console.log(`course ls [ -ACTIVE- ][ ${activeCourseBySchedule.language} ][ ${activeCourseBySchedule.schedule} ][ ${activeCourseBySchedule.courses.length} ]`);
+		});
+	});
+
+	cancelledLanguageCoursesSchedule.forEach( cancelledCourseByLanguage => {
+		cancelledCourseByLanguage.schedules.forEach( cancelledCourseBySchedule => {
+			console.log(`course ls [ -CANCELLED- ][ ${cancelledCourseBySchedule.language} ][ ${cancelledCourseBySchedule.schedule} ][ ${cancelledCourseBySchedule.courses.length} ]`);
+		});
 	});
 }
 
@@ -355,19 +363,19 @@ function classifyLanguageCoursesBySchedule ( languageCourses ){
 	const courses = cloneArrayData( languageCourses );
 
 	courses.forEach( languageCourse => {
-		languageCourse.schedules = classifyCourseBySchedule( languageCourse.courses );
+		languageCourse.schedules = classifyCourseBySchedule( languageCourse.courses, languageCourse.language );
 	});
 
 	return courses;
 }
 
-function classifyCourseBySchedule ( courses ){
+function classifyCourseBySchedule ( courses, language ){
 	return courses.reduce( ( acc, course ) => {
 		const positionCourseSchedule = getPositionCourseSchedule( acc, course );
 		if ( positionCourseSchedule.length ){
 			addCourseOnSchedule( acc, positionCourseSchedule[ 0 ], course );
 		} else {
-			addSchedule( acc, course );
+			addSchedule( acc, course, language );
 		}
 
 		return acc;
@@ -390,8 +398,9 @@ function addCourseOnSchedule ( acc, position, course ){
 	acc[ position ].courses.push( course );
 }
 
-function addSchedule ( acc, course ){
+function addSchedule ( acc, course, language ){
 	acc.push({
+		language: language,
 		schedule: course.schedule,
 		courses: [ course ],
 	});
