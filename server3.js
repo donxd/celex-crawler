@@ -38,6 +38,8 @@ const ENCODING_TEXT = 'utf-8';
 
 const BAD_ENCODING_REGEX = new RegExp( /[Ã]/, 'g' );
 
+const CANCEL_COURSE_TEXT = 'CANCELADO';
+
 for ( let i = 1; i <= numberRequests; i++ ){
 	makeRequest( i );
 }
@@ -155,7 +157,7 @@ function printInformation (){
 
 		// showInformation( dataCourses );
 		organizeInformation( dataCourses );
-		showInformation( dataCourses );
+		// showInformation( dataCourses );
 	}
 
 	requestProcessed = 0;
@@ -277,14 +279,18 @@ function organizeInformation ( dataCourses ){
 	const courses = JSON.parse(JSON.stringify( dataCourses ));
 	const activeCourses = getActiveCourses( courses );
 	const cancelledCourses = getCancelledCourses( courses );
+
+	console.log( 'courses.length -> ', courses.length );
+	console.log( 'activeCourses.length -> ', activeCourses.length );
+	console.log( 'cancelledCourses.length -> ', cancelledCourses.length );
 }
 
 function getActiveCourses ( courses ){
-	return courses;
+	return courses.filter(course => course.teacher !== CANCEL_COURSE_TEXT);
 }
 
 function getCancelledCourses ( courses ){
-	return courses;
+	return courses.filter(course => course.teacher === CANCEL_COURSE_TEXT);
 }
 
 
