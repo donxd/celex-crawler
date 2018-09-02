@@ -40,6 +40,9 @@ const BAD_ENCODING_REGEX = new RegExp( /[Ã]/, 'g' );
 
 const CANCEL_COURSE_TEXT = 'CANCELADO';
 
+const ACTIVE_COURSE = 'ACTIVE';
+const CANCELLED_COURSE = 'CANCELLED';
+
 for ( let i = 1; i <= numberRequests; i++ ){
 	makeRequest( i );
 }
@@ -298,17 +301,8 @@ function organizeInformation ( dataCourses ){
 	const activeLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( activeLanguageCourses );
 	const cancelledLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( cancelledLanguageCourses );
 
-	activeLanguageCoursesSchedule.forEach( activeCourseByLanguage => {
-		activeCourseByLanguage.schedules.forEach( activeCourseBySchedule => {
-			console.log(`course ls [ -ACTIVE- ][ ${activeCourseBySchedule.language} ][ ${activeCourseBySchedule.schedule} ][ ${activeCourseBySchedule.courses.length} ]`);
-		});
-	});
-
-	cancelledLanguageCoursesSchedule.forEach( cancelledCourseByLanguage => {
-		cancelledCourseByLanguage.schedules.forEach( cancelledCourseBySchedule => {
-			console.log(`course ls [ -CANCELLED- ][ ${cancelledCourseBySchedule.language} ][ ${cancelledCourseBySchedule.schedule} ][ ${cancelledCourseBySchedule.courses.length} ]`);
-		});
-	});
+	showDataCourseLanguage( activeLanguageCoursesSchedule, true );
+	showDataCourseLanguage( cancelledLanguageCoursesSchedule, false );
 }
 
 function cloneArrayData ( array ){
@@ -356,6 +350,16 @@ function addLanguage ( acc, course ){
 	acc.push({
 		language: course.language,
 		courses: [ course ],
+	});
+}
+
+function showDataCourseLanguage ( languageCoursesSchedule, activeFlag ){
+	const flag = activeFlag ? ACTIVE_COURSE : CANCELLED_COURSE;
+
+	languageCoursesSchedule.forEach( courseByLanguage => {
+		courseByLanguage.schedules.forEach( courseBySchedule => {
+			console.log(`course ls [ -${flag}- ][ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ]`);
+		});
 	});
 }
 
