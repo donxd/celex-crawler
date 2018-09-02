@@ -313,9 +313,9 @@ function getCancelledCourses ( courses ){
 
 function classifyCoursesByLanguage ( courses ){
 	return courses.reduce( ( acc, course ) => {
-		const positionCourse = listCoursesHas( acc, course );
-		if ( positionCourse.length ){
-			addCourse( acc, positionCourse[ 0 ], course );
+		const positionCourseLanguage = getPositionCourseLanguage( acc, course );
+		if ( positionCourseLanguage.length ){
+			addCourseOnLanguage( acc, positionCourseLanguage[ 0 ], course );
 		} else {
 			addLanguage( acc, course );
 		}
@@ -370,7 +370,7 @@ function addSchedule ( acc, course ){
 	});
 }
 
-function listCoursesHas ( courses, courseLanguage ){
+function getPositionCourseLanguage ( courses, courseLanguage ){
 	const positions = [];
 	for ( let position = 0; position < courses.length; position++ ){
 		if ( courses[ position ].language === courseLanguage.language ){
@@ -382,7 +382,7 @@ function listCoursesHas ( courses, courseLanguage ){
 	return positions;
 }
 
-function addCourse ( acc, position, course ){
+function addCourseOnLanguage ( acc, position, course ){
 	acc[ position ].courses.push( course );
 }
 
