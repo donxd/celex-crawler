@@ -276,7 +276,7 @@ function orderCourseList (){
 function organizeInformation ( dataCourses ){
 	sortOrderCourses( dataCourses );
 
-	const courses = JSON.parse(JSON.stringify( dataCourses ));
+	const courses = cloneArrayData( dataCourses );
 	const activeCourses = getActiveCourses( courses );
 	const cancelledCourses = getCancelledCourses( courses );
 
@@ -297,6 +297,10 @@ function organizeInformation ( dataCourses ){
 
 	const activeLanguageCoursesBySchedule = classifyLanguageCoursesBySchedule( activeLanguageCourses );
 	const cancelledLanguageCoursesBySchedule = classifyLanguageCoursesBySchedule( cancelledLanguageCourses );
+}
+
+function cloneArrayData ( array ){
+	return JSON.parse( JSON.stringify( array ) );
 }
 
 function getActiveCourses ( courses ){
