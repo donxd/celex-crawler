@@ -34,6 +34,8 @@ const FLAG_PARAMETER_YES = 'y';
 
 const PROPERTY_EMPTY = '-';
 
+const ENCODING_TEXT = 'utf-8';
+
 for ( let i = 1; i <= numberRequests; i++ ){
 	makeRequest( i );
 }
@@ -243,7 +245,7 @@ function getCleanDataStudent ( dataStudent ){
 	// dataStudent = toUTF8( dataStudent );
 	const characters = new RegExp( /[Ã]/, 'g' );
 	if ( characters.test( dataStudent ) ){
-		dataStudent = iconvLite.decode( dataStudent, 'utf-8' );
+		dataStudent = iconvLite.decode( dataStudent, ENCODING_TEXT );
 	}
 	// dataStudent = iconvLite.decode( dataStudent, 'ISO-8859-1' );
 
