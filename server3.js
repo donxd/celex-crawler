@@ -36,6 +36,8 @@ const PROPERTY_EMPTY = '-';
 
 const ENCODING_TEXT = 'utf-8';
 
+const BAD_ENCODING_REGEX = new RegExp( /[Ã]/, 'g' );
+
 for ( let i = 1; i <= numberRequests; i++ ){
 	makeRequest( i );
 }
@@ -243,8 +245,7 @@ function getStudentsData ( $, course ){
 
 function getCleanDataStudent ( dataStudent ){
 	// dataStudent = toUTF8( dataStudent );
-	const characters = new RegExp( /[Ã]/, 'g' );
-	if ( characters.test( dataStudent ) ){
+	if ( BAD_ENCODING_REGEX.test( dataStudent ) ){
 		dataStudent = iconvLite.decode( dataStudent, ENCODING_TEXT );
 	}
 	// dataStudent = iconvLite.decode( dataStudent, 'ISO-8859-1' );
