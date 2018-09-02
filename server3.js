@@ -288,15 +288,19 @@ function organizeInformation ( dataCourses ){
 	const cancelledLanguageCourses = classifyCoursesByLanguage( cancelledCourses );
 
 	activeLanguageCourses.forEach( activeCourseByLanguage => {
-		console.log(`course [ -ACTIVE- ][ ${activeCourseByLanguage.language} ][ ${activeCourseByLanguage.courses.length} ]`);
+		console.log(`course l [ -ACTIVE- ][ ${activeCourseByLanguage.language} ][ ${activeCourseByLanguage.courses.length} ]`);
 	});
 
 	cancelledLanguageCourses.forEach( cancelledCourseByLanguage => {
-		console.log(`course [ -CANCELLED- ][ ${cancelledCourseByLanguage.language} ][ ${cancelledCourseByLanguage.courses.length} ]`);
+		console.log(`course l [ -CANCELLED- ][ ${cancelledCourseByLanguage.language} ][ ${cancelledCourseByLanguage.courses.length} ]`);
 	});
 
 	const activeLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( activeLanguageCourses );
 	const cancelledLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( cancelledLanguageCourses );
+
+	activeLanguageCoursesSchedule.forEach( activeCourseByLanguage => {
+		console.log(`course ls [ -ACTIVE- ][ ${activeCourseByLanguage.language} ][ ${activeCourseByLanguage.courses.length} ]`);
+	});
 }
 
 function cloneArrayData ( array ){
