@@ -32,6 +32,8 @@ const FORMAT_SHOW = 'YYYY-MM-DD HH:mm:ss';
 
 const FLAG_PARAMETER_YES = 'y';
 
+const PROPERTY_EMPTY = '-';
+
 for ( let i = 1; i <= numberRequests; i++ ){
 	makeRequest( i );
 }
@@ -207,7 +209,7 @@ function getInfoCourse ( $, course, linkItem, publicationTimeItem, titleItem ){
 }
 
 function getDataFromPosition ( data, position ){
-	return data.eq( position ).text() ? data.eq( position ).text().trim() : '-';
+	return data.eq( position ).text() ? data.eq( position ).text().trim() : PROPERTY_EMPTY;
 }
 
 function getStudentsData ( $, course ){
