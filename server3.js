@@ -324,6 +324,29 @@ function classifyCoursesByLanguage ( courses ){
 	}, [] );
 }
 
+function getPositionCourseLanguage ( courses, courseLanguage ){
+	const positions = [];
+	for ( let position = 0; position < courses.length; position++ ){
+		if ( courses[ position ].language === courseLanguage.language ){
+			positions.push( position );
+			break;
+		}
+	}
+
+	return positions;
+}
+
+function addCourseOnLanguage ( acc, position, course ){
+	acc[ position ].courses.push( course );
+}
+
+function addLanguage ( acc, course ){
+	acc.push({
+		language: course.language,
+		courses: [ course ],
+	});
+}
+
 function classifyLanguageCoursesBySchedule ( languageCourses ){
 	const courses = cloneArrayData( languageCourses );
 
@@ -366,29 +389,6 @@ function addCourseOnSchedule ( acc, position, course ){
 function addSchedule ( acc, course ){
 	acc.push({
 		schedule: course.schedule,
-		courses: [ course ],
-	});
-}
-
-function getPositionCourseLanguage ( courses, courseLanguage ){
-	const positions = [];
-	for ( let position = 0; position < courses.length; position++ ){
-		if ( courses[ position ].language === courseLanguage.language ){
-			positions.push( position );
-			break;
-		}
-	}
-
-	return positions;
-}
-
-function addCourseOnLanguage ( acc, position, course ){
-	acc[ position ].courses.push( course );
-}
-
-function addLanguage ( acc, course ){
-	acc.push({
-		language: course.language,
 		courses: [ course ],
 	});
 }
