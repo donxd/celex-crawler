@@ -301,8 +301,8 @@ function organizeInformation ( dataCourses ){
 	const activeLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( activeLanguageCourses );
 	const cancelledLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( cancelledLanguageCourses );
 
-	showDataCourseLanguage( activeLanguageCoursesSchedule, true );
-	showDataCourseLanguage( cancelledLanguageCoursesSchedule, false );
+	showDataCourseLanguageSchedule( activeLanguageCoursesSchedule, true );
+	showDataCourseLanguageSchedule( cancelledLanguageCoursesSchedule, false );
 }
 
 function cloneArrayData ( array ){
@@ -353,7 +353,7 @@ function addLanguage ( acc, course ){
 	});
 }
 
-function showDataCourseLanguage ( languageCoursesSchedule, activeFlag ){
+function showDataCourseLanguageSchedule ( languageCoursesSchedule, activeFlag ){
 	const flag = activeFlag ? ACTIVE_COURSE : CANCELLED_COURSE;
 
 	languageCoursesSchedule.forEach( courseByLanguage => {
