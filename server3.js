@@ -210,12 +210,7 @@ function getStudentsData ( $, course ){
 		if ( index > 3 ){
 
 			let dataStudent = $( student ).find( TAG_DATA_INFO ).eq( 1 ).text();
-			// dataStudent = toUTF8( dataStudent );
-			const characters = new RegExp( /[Ã]/, 'g' );
-			if ( characters.test( dataStudent ) ){
-				dataStudent = iconvLite.decode( dataStudent, 'utf-8' );
-			}
-			// dataStudent = iconvLite.decode( dataStudent, 'ISO-8859-1' );
+			dataStudent = getCleanDataStudent( dataStudent );
 
 			students.push( dataStudent );
 		}
@@ -225,10 +220,7 @@ function getStudentsData ( $, course ){
 		$( course ).find( TAG_DATA_INFO ).each( ( index, student ) => {
 			if ( index % 2 ){
 				let dataStudent = $( student ).text();
-				const characters = new RegExp( /[Ã]/, 'g' );
-				if ( characters.test( dataStudent ) ){
-					dataStudent = iconvLite.decode( dataStudent, 'utf-8' );
-				}
+				dataStudent = getCleanDataStudent( dataStudent );
 
 				students.push( dataStudent );
 			}
@@ -236,6 +228,17 @@ function getStudentsData ( $, course ){
 	}
 
 	return students;
+}
+
+function getCleanDataStudent ( dataStudent ){
+	// dataStudent = toUTF8( dataStudent );
+	const characters = new RegExp( /[Ã]/, 'g' );
+	if ( characters.test( dataStudent ) ){
+		dataStudent = iconvLite.decode( dataStudent, 'utf-8' );
+	}
+	// dataStudent = iconvLite.decode( dataStudent, 'ISO-8859-1' );
+
+	return dataStudent;
 }
 
 function orderCourseList (){
