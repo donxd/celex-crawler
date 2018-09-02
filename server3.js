@@ -303,7 +303,7 @@ function organizeInformation ( dataCourses ){
 	const languageCoursesSchedule = classifyLanguageCoursesBySchedule( languageCourses );
 	// const activeLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( activeLanguageCourses );
 	// const cancelledLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( cancelledLanguageCourses );
-
+	sortCoursesLanguageBySchedule( languageCoursesSchedule );
 	showDataCourseLanguageSchedule( languageCoursesSchedule );
 	// showDataCourseLanguageSchedule( activeLanguageCoursesSchedule, true );
 	// showDataCourseLanguageSchedule( cancelledLanguageCoursesSchedule, false );
@@ -357,11 +357,26 @@ function addLanguage ( acc, course ){
 	});
 }
 
-function showDataCourseLanguage ( languageCourses, activeFlag = null){
+function showDataCourseLanguage ( languageCourses, activeFlag = null ){
 	const flag = getFlagData( activeFlag );
 
 	languageCourses.forEach( courseByLanguage => {
 		console.log(`course l ${flag}[ ${courseByLanguage.language} ][ ${courseByLanguage.courses.length} ]`);
+	});
+}
+
+function sortCoursesLanguageBySchedule ( languageCoursesSchedule ){
+	languageCoursesSchedule.forEach( courseByLanguage => {
+		sortCoursesBySchedule( courseByLanguage );
+	});
+}
+
+function sortCoursesBySchedule ( courseByLanguage ){
+	courseByLanguage.schedules.sort( ( a, b ) => {
+		if ( a.schedule === b.schedule ) return 0;
+		if ( a.schedule > b.schedule ) return 1;
+
+		return -1;
 	});
 }
 
