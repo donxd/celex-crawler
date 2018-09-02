@@ -335,7 +335,39 @@ function classifyLanguageCoursesBySchedule ( languageCourses ){
 }
 
 function classifyCourseBySchedule ( courses ){
-	return courses;
+	return courses.reduce( ( acc, course ) => {
+		const positionCourseSchedule = getPositionCourseSchedule( acc, course );
+		if ( positionCourseSchedule.length ){
+			addCourseOnSchedule( acc, positionCourseSchedule[ 0 ], course );
+		} else {
+			addSchedule( acc, course );
+		}
+
+		return acc;
+	}, [] );
+}
+
+function getPositionCourseSchedule ( courses, courseLanguage ){
+	const positions = [];
+	for ( let position = 0; position < courses.length; position++ ){
+		if ( courses[ position ].schedule === courseLanguage.schedule ){
+			positions.push( position );
+			break;
+		}
+	}
+
+	return positions;
+}
+
+function addCourseOnSchedule ( acc, position, course ){
+	acc[ position ].courses.push( course );
+}
+
+function addSchedule ( acc, course ){
+	acc.push({
+		schedule: course.schedule,
+		courses: [ course ],
+	});
 }
 
 function listCoursesHas ( courses, courseLanguage ){
