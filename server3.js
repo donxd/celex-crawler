@@ -14,6 +14,7 @@ let requestProcessed = 0;
 // const URL_DATA = 'https://celexupiicsa.info/?s=ubicación -examen&feed=rss2';
 const URL_DATA_ALL = 'https://celexupiicsa.info/?s=ubicaci%C3%B3n%20-examen&feed=rss2'; // all data
 const URL_DATA_LINKS = 'https://celexupiicsa.info/?s=ubicaci%C3%B3n%20-examen&feed=rss'; // links
+const URL_PAGINATION = '&paged=';
 
 const TAG_ELEMENT_DATA = 'item';
 const TAG_TITLE_ITEM = 'title';
@@ -69,7 +70,7 @@ function makeRequest ( pagination ){
 function getUrlWithPagination ( pagination ){
 	const urlData = fullProcess ? URL_DATA_ALL : URL_DATA_LINKS;
 	if ( pagination > 1 ){
-		return urlData + '&paged=' + pagination;
+		return urlData + URL_PAGINATION + pagination;
 	}
 
 	return urlData;
