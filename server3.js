@@ -273,7 +273,20 @@ function orderCourseList (){
 
 function organizeInformation ( dataCourses ){
 	sortOrderCourses( dataCourses );
+
+	const courses = JSON.parse(JSON.stringify( dataCourses ));
+	const activeCourses = getActiveCourses( courses );
+	const cancelledCourses = getCancelledCourses( courses );
 }
+
+function getActiveCourses ( course ){
+	return course;
+}
+
+function getCancelledCourses ( course ){
+	return course;
+}
+
 
 function sortOrderCourses ( dataCourses ){
 	dataCourses.sort( ( a, b ) => {
