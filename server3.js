@@ -358,25 +358,27 @@ function addLanguage ( acc, course ){
 }
 
 function showDataCourseLanguage ( languageCourses, activeFlag = null){
-	const flag = activeFlag !== null ?
-		activeFlag ? ACTIVE_COURSE : CANCELLED_COURSE:
-		UNDEFINED_STATUS_COURSE;
+	const flag = getFlagData( activeFlag );
 
 	languageCourses.forEach( courseByLanguage => {
-		console.log(`course l [ -${flag}- ][ ${courseByLanguage.language} ][ ${courseByLanguage.courses.length} ]`);
+		console.log(`course l ${flag}[ ${courseByLanguage.language} ][ ${courseByLanguage.courses.length} ]`);
 	});
 }
 
 function showDataCourseLanguageSchedule ( languageCoursesSchedule, activeFlag = null ){
-	const flag = activeFlag !== null ?
-		activeFlag ? ACTIVE_COURSE : CANCELLED_COURSE:
-		UNDEFINED_STATUS_COURSE;
+	const flag = getFlagData( activeFlag );
 
 	languageCoursesSchedule.forEach( courseByLanguage => {
 		courseByLanguage.schedules.forEach( courseBySchedule => {
-			console.log(`course ls [ -${flag}- ][ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ]`);
+			console.log(`course ls ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ]`);
 		});
 	});
+}
+
+function getFlagData ( activeFlag ){
+	return activeFlag !== null ?
+		`[ -${activeFlag ? ACTIVE_COURSE : CANCELLED_COURSE}- ]` :
+		'';
 }
 
 function classifyLanguageCoursesBySchedule ( languageCourses ){
