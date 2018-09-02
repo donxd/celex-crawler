@@ -295,8 +295,8 @@ function organizeInformation ( dataCourses ){
 		console.log(`course [ -CANCELLED- ][ ${cancelledCourseByLanguage.language} ][ ${cancelledCourseByLanguage.courses.length} ]`);
 	});
 
-	const activeLanguageCoursesBySchedule = classifyLanguageCoursesBySchedule( activeLanguageCourses );
-	const cancelledLanguageCoursesBySchedule = classifyLanguageCoursesBySchedule( cancelledLanguageCourses );
+	const activeLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( activeLanguageCourses );
+	const cancelledLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( cancelledLanguageCourses );
 }
 
 function cloneArrayData ( array ){
