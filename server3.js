@@ -154,7 +154,7 @@ function printInformation (){
 function showInformation ( dataCourses ){
 	dataCourses.forEach(course => {
 		// console.log('course -> ', JSON.stringify(course));
-		console.log(`course [ ${course.publication} ][ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ][ s: ${course.students.length} ] `);
+		console.log(`course [ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.publication} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ][ s: ${course.students.length} ] `);
 		// course.students.forEach(student => {
 		// 	console.log( `student -> ${student} `);
 		// });
