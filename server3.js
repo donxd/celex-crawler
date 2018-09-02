@@ -42,7 +42,7 @@ const CANCEL_COURSE_TEXT = 'CANCELADO';
 
 const ACTIVE_COURSE = 'ACTIVE';
 const CANCELLED_COURSE = 'CANCELLED';
-const UNDEFINED_STATUS_COURSE = '/';
+const UNDEFINED_STATUS_COURSE = '';
 
 for ( let i = 1; i <= numberRequests; i++ ){
 	makeRequest( i );
@@ -376,9 +376,9 @@ function showDataCourseLanguageSchedule ( languageCoursesSchedule, activeFlag = 
 }
 
 function getFlagData ( activeFlag ){
-	return activeFlag !== null ?
-		`[ -${activeFlag ? ACTIVE_COURSE : CANCELLED_COURSE}- ]` :
-		'';
+	if ( activeFlag !== null ) return `[ -${activeFlag ? ACTIVE_COURSE : CANCELLED_COURSE}- ]`;
+
+	return UNDEFINED_STATUS_COURSE;
 }
 
 function classifyLanguageCoursesBySchedule ( languageCourses ){
