@@ -295,8 +295,8 @@ function organizeInformation ( dataCourses ){
 		console.log(`course [ -CANCELLED- ][ ${cancelledCourseByLanguage.language} ][ ${cancelledCourseByLanguage.courses.length} ]`);
 	});
 
-	const activeCoursesByLanguageAndSchedule = classifyLanguageCoursesBySchedule( activeLanguageCourses );
-	const cancelledCoursesByLanguageAndSchedule = classifyLanguageCoursesBySchedule( cancelledLanguageCourses );
+	const activeLanguageCoursesBySchedule = classifyLanguageCoursesBySchedule( activeLanguageCourses );
+	const cancelledLanguageCoursesBySchedule = classifyLanguageCoursesBySchedule( cancelledLanguageCourses );
 }
 
 function getActiveCourses ( courses ){
@@ -320,8 +320,8 @@ function classifiedCoursesByLanguage ( courses ){
 	}, [] );
 }
 
-function classifyLanguageCoursesBySchedule ( coursesByLanguage ){
-	return coursesByLanguage;
+function classifyLanguageCoursesBySchedule ( languageCourses ){
+	return languageCourses;
 }
 
 function listCoursesHas ( courses, courseLanguage ){
