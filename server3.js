@@ -283,16 +283,57 @@ function organizeInformation ( dataCourses ){
 	console.log( 'courses.length -> ', courses.length );
 	console.log( 'activeCourses.length -> ', activeCourses.length );
 	console.log( 'cancelledCourses.length -> ', cancelledCourses.length );
+
+	const classifiedCancelledCourses = classifiedCourses( cancelledCourses );
+
+	classifiedCancelledCourses.forEach( cancelledCourse => {
+		console.log(`course [ -CANCELLED- ][ ${cancelledCourse.language} ] `);
+	});
 }
 
 function getActiveCourses ( courses ){
-	return courses.filter(course => course.teacher !== CANCEL_COURSE_TEXT);
+	return courses.filter( course => course.teacher !== CANCEL_COURSE_TEXT );
 }
 
 function getCancelledCourses ( courses ){
-	return courses.filter(course => course.teacher === CANCEL_COURSE_TEXT);
+	return courses.filter( course => course.teacher === CANCEL_COURSE_TEXT );
 }
 
+function classifiedCourses ( courses ){
+	return courses.reduce( ( acc, course ) => {
+		const positionCourse = listCoursesHas( acc, course );
+		if ( positionCourse.length ){
+			addCourse( acc, positionCourse[ 0 ], course );
+		} else {
+			addLanguage( acc, course );
+		}
+
+		return acc;
+	}, [] );
+}
+
+function listCoursesHas ( courses, courseLanguage ){
+	const positions = [];
+	for ( let position = 0; position < courses.length; position++ ){
+		if ( courses[ position ].language === courseLanguage.language ){
+			positions.push( position );
+			break;
+		}
+	}
+
+	return positions;
+}
+
+function addCourse ( acc, position, course ){
+	acc[ position ].courses.push( course );
+}
+
+function addLanguage ( acc, course ){
+	acc.push({
+		language: course.language,
+		courses: [ course ],
+	});
+}
 
 function sortOrderCourses ( dataCourses ){
 	dataCourses.sort( ( a, b ) => {
