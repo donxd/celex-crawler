@@ -190,17 +190,21 @@ function getInfoCourse ( $, course, linkItem, publicationTimeItem, titleItem ){
 	const studentsData = getStudentsData( $, course );
 
 	return {
-		language: data.eq(1).text() ? data.eq(1).text().trim() : '-',
-		semester: data.eq(3).text() ? data.eq(3).text().trim() : '-',
-		level: data.eq(5).text() ? data.eq(5).text().trim() : '-',
-		teacher: data.eq(8).text() ? data.eq(8).text().trim() : '-',
-		schedule: data.eq(10).text() ? data.eq(10).text().trim() : '-',
-		classroom: data.eq(12).text() ? data.eq(12).text().trim() : '-',
+		language: getDataFromPosition( data, 1 ),
+		semester: getDataFromPosition( data, 3 ),
+		level: getDataFromPosition( data, 5 ),
+		teacher: getDataFromPosition( data, 8 ),
+		schedule: getDataFromPosition( data, 10 ),
+		classroom: getDataFromPosition( data, 12 ),
 		link : linkItem,
 		publication : publicationTimeItem,
 		title : titleItem,
 		students: studentsData,
 	};
+}
+
+function getDataFromPosition ( data, position ){
+	return data.eq( position ).text() ? data.eq( position ).text().trim() : '-';
 }
 
 function getStudentsData ( $, course ){
