@@ -284,7 +284,12 @@ function organizeInformation ( dataCourses ){
 	console.log( 'activeCourses.length -> ', activeCourses.length );
 	console.log( 'cancelledCourses.length -> ', cancelledCourses.length );
 
+	const classifiedActiveCoursesByLanguage = classifiedCoursesByLanguage( activeCourses );
 	const classifiedCancelledCoursesByLanguage = classifiedCoursesByLanguage( cancelledCourses );
+
+	classifiedActiveCoursesByLanguage.forEach( activeCourseByLanguage => {
+		console.log(`course [ -ACTIVE- ][ ${activeCourseByLanguage.language} ][ ${activeCourseByLanguage.courses.length} ]`);
+	});
 
 	classifiedCancelledCoursesByLanguage.forEach( cancelledCourseByLanguage => {
 		console.log(`course [ -CANCELLED- ][ ${cancelledCourseByLanguage.language} ][ ${cancelledCourseByLanguage.courses.length} ]`);
