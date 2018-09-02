@@ -42,6 +42,7 @@ const CANCEL_COURSE_TEXT = 'CANCELADO';
 
 const ACTIVE_COURSE = 'ACTIVE';
 const CANCELLED_COURSE = 'CANCELLED';
+const UNDEFINED_STATUS_COURSE = '/';
 
 for ( let i = 1; i <= numberRequests; i++ ){
 	makeRequest( i );
@@ -284,24 +285,28 @@ function organizeInformation ( dataCourses ){
 	sortOrderCourses( dataCourses );
 
 	const courses = cloneArrayData( dataCourses );
-	const activeCourses = getActiveCourses( courses );
-	const cancelledCourses = getCancelledCourses( courses );
+	// const activeCourses = getActiveCourses( courses );
+	// const cancelledCourses = getCancelledCourses( courses );
 
 	console.log( 'courses.length -> ', courses.length );
-	console.log( 'activeCourses.length -> ', activeCourses.length );
-	console.log( 'cancelledCourses.length -> ', cancelledCourses.length );
+	// console.log( 'activeCourses.length -> ', activeCourses.length );
+	// console.log( 'cancelledCourses.length -> ', cancelledCourses.length );
 
-	const activeLanguageCourses = classifyCoursesByLanguage( activeCourses );
-	const cancelledLanguageCourses = classifyCoursesByLanguage( cancelledCourses );
+	const languageCourses = classifyCoursesByLanguage( courses );
+	// const activeLanguageCourses = classifyCoursesByLanguage( activeCourses );
+	// const cancelledLanguageCourses = classifyCoursesByLanguage( cancelledCourses );
 
-	showDataCourseLanguage( activeLanguageCourses, true );
-	showDataCourseLanguage( cancelledLanguageCourses, false );
+	showDataCourseLanguage( languageCourses );
+	// showDataCourseLanguage( activeLanguageCourses, true );
+	// showDataCourseLanguage( cancelledLanguageCourses, false );
 
-	const activeLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( activeLanguageCourses );
-	const cancelledLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( cancelledLanguageCourses );
+	const languageCoursesSchedule = classifyLanguageCoursesBySchedule( languageCourses );
+	// const activeLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( activeLanguageCourses );
+	// const cancelledLanguageCoursesSchedule = classifyLanguageCoursesBySchedule( cancelledLanguageCourses );
 
-	showDataCourseLanguageSchedule( activeLanguageCoursesSchedule, true );
-	showDataCourseLanguageSchedule( cancelledLanguageCoursesSchedule, false );
+	showDataCourseLanguageSchedule( languageCoursesSchedule );
+	// showDataCourseLanguageSchedule( activeLanguageCoursesSchedule, true );
+	// showDataCourseLanguageSchedule( cancelledLanguageCoursesSchedule, false );
 }
 
 function cloneArrayData ( array ){
@@ -352,16 +357,20 @@ function addLanguage ( acc, course ){
 	});
 }
 
-function showDataCourseLanguage ( languageCourses, activeFlag ){
-	const flag = activeFlag ? ACTIVE_COURSE : CANCELLED_COURSE;
+function showDataCourseLanguage ( languageCourses, activeFlag = null){
+	const flag = activeFlag !== null ?
+		activeFlag ? ACTIVE_COURSE : CANCELLED_COURSE:
+		UNDEFINED_STATUS_COURSE;
 
 	languageCourses.forEach( courseByLanguage => {
 		console.log(`course l [ -${flag}- ][ ${courseByLanguage.language} ][ ${courseByLanguage.courses.length} ]`);
 	});
 }
 
-function showDataCourseLanguageSchedule ( languageCoursesSchedule, activeFlag ){
-	const flag = activeFlag ? ACTIVE_COURSE : CANCELLED_COURSE;
+function showDataCourseLanguageSchedule ( languageCoursesSchedule, activeFlag = null ){
+	const flag = activeFlag !== null ?
+		activeFlag ? ACTIVE_COURSE : CANCELLED_COURSE:
+		UNDEFINED_STATUS_COURSE;
 
 	languageCoursesSchedule.forEach( courseByLanguage => {
 		courseByLanguage.schedules.forEach( courseBySchedule => {
