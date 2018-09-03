@@ -385,7 +385,12 @@ function showDataCourseLanguageSchedule ( languageCoursesSchedule, activeFlag = 
 
 	languageCoursesSchedule.forEach( courseByLanguage => {
 		courseByLanguage.schedules.forEach( courseBySchedule => {
-			console.log(`course ls ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ]`);
+			// console.log(`c ls ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ]`);
+			courseBySchedule.courses.forEach( course => {
+				console.log(`c lsc ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ][ ${course.title} ][ ${course.level} ][ ${course.publication} ][ s: ${course.students.length} ]`);
+				// console.log(`c lsc ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ][ ${course.level} ][ ${course.publication} ][ s: ${course.students.length} ][ ${course.title} ]`);
+				// console.log(`course [ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.publication} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ][ s: ${course.students.length} ] `);
+			});
 		});
 	});
 }
