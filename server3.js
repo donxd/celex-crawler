@@ -217,13 +217,24 @@ function getInfoCourse ( $, course, linkItem, publicationTimeItem, titleItem ){
 		classroom: getDataFromPosition( data, 12 ),
 		link : linkItem,
 		publication : publicationTimeItem,
-		title : titleItem,
+		title : cleanTitleItem( titleItem ),
+		titleOriginal : titleItem,
 		students: studentsData,
 	};
 }
 
 function getDataFromPosition ( data, position ){
 	return data.eq( position ).text() ? data.eq( position ).text().trim() : PROPERTY_EMPTY;
+}
+
+function cleanTitleItem ( title ){
+	const titleCleaningSymbols = { regex: /&#8211;/g, replace: '–' };
+	const titleCleanRemove = { regex: /(Listas de cursos de )|(Listas de curso de )/g, replace: '' };
+
+	title = title.replace( titleCleaningSymbols.regex, titleCleaningSymbols.replace );
+	title = title.replace( titleCleanRemove.regex, titleCleanRemove.replace );
+
+	return title;
 }
 
 function getStudentsData ( $, course ){
