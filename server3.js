@@ -38,6 +38,8 @@ const TITLE_SEPARATOR = '–';
 const ENCODING_TEXT = 'utf-8';
 
 const BAD_ENCODING_REGEX = new RegExp( /[Ã]/, 'g' );
+const REPEATED_SPACE = new RegExp( /[ ]+/, 'g');
+const SINGLE_SPACE_FOR_STUDENT_NAME = ' ';
 
 const CANCEL_COURSE_TEXT = 'CANCELADO';
 
@@ -282,12 +284,16 @@ function getStudentsData ( $, course ){
 
 function getCleanDataStudent ( dataStudent ){
 	// dataStudent = toUTF8( dataStudent );
-	if ( BAD_ENCODING_REGEX.test( dataStudent ) ){
-		dataStudent = iconvLite.decode( dataStudent, ENCODING_TEXT );
+	let dataStudentCleaned = dataStudent.replace( REPEATED_SPACE, SINGLE_SPACE_FOR_STUDENT_NAME );
+
+	// dataStudent = dataStudent.trim().replace( REPEATED_SPACE, SINGLE_SPACE_FOR_STUDENT_NAME );
+
+	if ( BAD_ENCODING_REGEX.test( dataStudentCleaned ) ){
+		dataStudentCleaned = iconvLite.decode( dataStudentCleaned, ENCODING_TEXT );
 	}
 	// dataStudent = iconvLite.decode( dataStudent, 'ISO-8859-1' );
 
-	return dataStudent;
+	return dataStudentCleaned;
 }
 
 function orderCourseList (){
