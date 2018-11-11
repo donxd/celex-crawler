@@ -37,8 +37,9 @@ const TITLE_SEPARATOR = '–';
 
 const ENCODING_TEXT = 'utf-8';
 
-const BAD_ENCODING_REGEX = new RegExp( /[Ã]/, 'g' );
+const BAD_ENCODING_SYMBOL = 'Ã';
 const REPEATED_SPACE = new RegExp( /[ ]+/, 'g');
+
 const SINGLE_SPACE_FOR_STUDENT_NAME = ' ';
 
 const CANCEL_COURSE_TEXT = 'CANCELADO';
@@ -181,7 +182,7 @@ function showCourseData ( course ){
 	// console.log('course -> ', JSON.stringify(course));
 	console.log(`course [ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.publication} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ][ s: ${course.students.length} ] `);
 	course.students.forEach(student => {
-		console.log( `student -> ${student} `);
+		console.log( `student -> ${student}`);
 	});
 }
 
@@ -283,12 +284,12 @@ function getStudentsData ( $, course ){
 }
 
 function getCleanDataStudent ( dataStudent ){
+	// console.log(`=======>${dataStudent}<=======`);
+
 	// dataStudent = toUTF8( dataStudent );
-	let dataStudentCleaned = dataStudent.replace( REPEATED_SPACE, SINGLE_SPACE_FOR_STUDENT_NAME );
+	let dataStudentCleaned = dataStudent.trim().replace( REPEATED_SPACE, SINGLE_SPACE_FOR_STUDENT_NAME );
 
-	// dataStudent = dataStudent.trim().replace( REPEATED_SPACE, SINGLE_SPACE_FOR_STUDENT_NAME );
-
-	if ( BAD_ENCODING_REGEX.test( dataStudentCleaned ) ){
+	if ( dataStudentCleaned.indexOf( BAD_ENCODING_SYMBOL ) !== -1 ){
 		dataStudentCleaned = iconvLite.decode( dataStudentCleaned, ENCODING_TEXT );
 	}
 	// dataStudent = iconvLite.decode( dataStudent, 'ISO-8859-1' );
