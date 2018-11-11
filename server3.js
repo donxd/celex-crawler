@@ -33,6 +33,7 @@ const FORMAT_SHOW = 'YYYY-MM-DD HH:mm:ss';
 const FLAG_PARAMETER_YES = 'y';
 
 const PROPERTY_EMPTY = '-';
+const TITLE_SEPARATOR = '–';
 
 const ENCODING_TEXT = 'utf-8';
 
@@ -161,7 +162,7 @@ function printInformation (){
 
 		// showInformation( dataCourses );
 		organizeInformation( dataCourses );
-		// showInformation( dataCourses );
+		showInformation( dataCourses );
 	}
 
 	requestProcessed = 0;
@@ -177,9 +178,9 @@ function showInformation ( dataCourses ){
 function showCourseData ( course ){
 	// console.log('course -> ', JSON.stringify(course));
 	console.log(`course [ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.publication} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ][ s: ${course.students.length} ] `);
-	// course.students.forEach(student => {
-	// 	console.log( `student -> ${student} `);
-	// });
+	course.students.forEach(student => {
+		console.log( `student -> ${student} `);
+	});
 }
 
 function classifyItem ( dataCourses, item, linkItem, publicationTimeItem, titleItem ){
@@ -218,6 +219,7 @@ function getInfoCourse ( $, course, linkItem, publicationTimeItem, titleItem ){
 		link : linkItem,
 		publication : publicationTimeItem,
 		title : cleanTitleItem( titleItem ),
+		titleComponents : componentsTitle( titleItem ),
 		titleOriginal : titleItem,
 		students: studentsData,
 	};
@@ -228,13 +230,27 @@ function getDataFromPosition ( data, position ){
 }
 
 function cleanTitleItem ( title ){
-	const titleCleaningSymbols = { regex: /&#8211;/g, replace: '–' };
+	const titleCleaningSymbols = { regex: /(&#8211;)|(-)/g, replace: TITLE_SEPARATOR };
 	const titleCleanRemove = { regex: /(Listas de cursos de )|(Listas de curso de )/g, replace: '' };
 
 	title = title.replace( titleCleaningSymbols.regex, titleCleaningSymbols.replace );
 	title = title.replace( titleCleanRemove.regex, titleCleanRemove.replace );
 
 	return title;
+}
+
+function componentsTitle ( titleItem ){
+	const cleanTitle = cleanTitleItem( titleItem );
+
+	const components = cleanTitle.split( TITLE_SEPARATOR )
+		.map( component => component.trim() );
+
+	return {
+		language: components[ 0 ],
+		schedule: components[ 1 ],
+		dateStart: components[ 2 ],
+		code: components[ 3 ],
+	};
 }
 
 function getStudentsData ( $, course ){
@@ -398,11 +414,14 @@ function showDataCourseLanguageSchedule ( languageCoursesSchedule, activeFlag = 
 		courseByLanguage.schedules.forEach( courseBySchedule => {
 			// console.log(`c ls ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ]`);
 			courseBySchedule.courses.forEach( course => {
-				console.log(`c lsc ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ][ ${course.title} ][ ${course.level} ][ ${course.publication} ][ s: ${course.students.length} ]`);
+				console.log(`c lsc ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ][ ${course.titleComponents.schedule} ][ ${course.titleComponents.dateStart} ][ ${course.level} ][ ${course.publication} ][ s: ${course.students.length} ]`);
+				// console.log(`c lsc ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ][ ${course.title} ][ ${course.level} ][ ${course.publication} ][ s: ${course.students.length} ]`);
 				// console.log(`c lsc ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ][ ${course.level} ][ ${course.publication} ][ s: ${course.students.length} ][ ${course.title} ]`);
 				// console.log(`course [ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.publication} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ][ s: ${course.students.length} ] `);
 			});
+			console.log('-----------------------------------------------------------------------------------------------');
 		});
+		console.log('-----------------------------------------------------------------------------------------------');
 	});
 }
 
