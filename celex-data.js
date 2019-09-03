@@ -3,6 +3,7 @@ const iconv = require( 'iconv' );
 const iconvLite = require('iconv-lite');
 const moment = require( 'moment' );
 const request = require( 'request' );
+const Events = require( 'events' );
 // const schedule = require( 'node-schedule' );
 // const Persistence = require('./persistence');
 
@@ -52,8 +53,9 @@ const UNDEFINED_STATUS_COURSE = '';
 //     makeRequest( i );
 // }
 
-class CelexData {
+class CelexData extends Events  {
     constructor() {
+        super();
         // let fullProcess = this.getParamterFullProcess();
         // let numberRequests = this.getParameterNumberRequest();
         this.fullProcess = this.getParamterFullProcess();
@@ -79,7 +81,7 @@ class CelexData {
 
     makeRequest ( pagination ){
         let urlPagination = this.getUrlWithPagination( pagination );
-        console.log( 'mensaje - realizando petición [ %s ] ', urlPagination );
+        // console.log( 'mensaje - realizando petición [ %s ] ', urlPagination );
 
         request( urlPagination, ( error, response, content ) => {
             // content = iconvLite.decode( content, 'utf-8' );
@@ -103,7 +105,7 @@ class CelexData {
         let $ = cheerio.load( content, { xmlMode: true, decodeEntities: false } );
         // let $ = cheerio.load( content, { xmlMode: true, decodeEntities: true } );
         // let $ = cheerio.load( content, { xmlMode: true } );
-        // console.log('content request -> ', content);
+        // // console.log('content request -> ', content);
 
         if ( requestProcessed == 0 ){
             courseList = [];
@@ -150,7 +152,7 @@ class CelexData {
     }
 
     printInformation (){
-        console.log( 'courseList.length -> ', courseList.length );
+        // console.log( 'courseList.length -> ', courseList.length );
         if ( courseList.length > 0 ){
 
             // orderCourseList();
@@ -163,7 +165,7 @@ class CelexData {
                 const publicationTimeItem = this.getTimePublicationItem( element );
                 const titleItem = this.getTitleItem( element );
 
-                console.log( `[ ${publicationTimeItem} ] title [ ${titleItem} ] [ ${index} ] content ? ${hasContentItem} ` );
+                // console.log( `[ ${publicationTimeItem} ] title [ ${titleItem} ] [ ${index} ] content ? ${hasContentItem} ` );
 
                 if ( !!hasContentItem ){
                     this.classifyItem( dataCourses, element, linkItem, publicationTimeItem, titleItem );
@@ -183,13 +185,15 @@ class CelexData {
         dataCourses.forEach(course => {
             this.showCourseData( course );
         });
+        // console.log('data : ', dataCourses);
+        this.emit('data-processed');
     }
 
     showCourseData ( course ){
-        // console.log('course -> ', JSON.stringify(course));
-        console.log(`course [ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.publication} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ][ s: ${course.students.length} ] `);
+        // // console.log('course -> ', JSON.stringify(course));
+        // console.log(`course [ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.publication} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ][ s: ${course.students.length} ] `);
         course.students.forEach(student => {
-            console.log( `student -> ${student}`);
+            // console.log( `student -> ${student}`);
         });
     }
 
@@ -205,7 +209,7 @@ class CelexData {
         // const $$ = cheerio.load( contentItem, { xmlMode: true } );
         const itemLists = $$( TAG_LIST_COURSES );
 
-        // console.log( `item[ courses ] # ${itemLists.length}`);
+        // // console.log( `item[ courses ] # ${itemLists.length}`);
 
         const courses = [];
 
@@ -291,7 +295,7 @@ class CelexData {
     }
 
     getCleanDataStudent ( dataStudent ){
-        // console.log(`=======>${dataStudent}<=======`);
+        // // console.log(`=======>${dataStudent}<=======`);
 
         // dataStudent = toUTF8( dataStudent );
         let dataStudentCleaned = dataStudent.trim().replace( REPEATED_SPACE, SINGLE_SPACE_FOR_STUDENT_NAME );
@@ -329,9 +333,9 @@ class CelexData {
         // const activeCourses = getActiveCourses( courses );
         // const cancelledCourses = getCancelledCourses( courses );
 
-        console.log( 'courses.length -> ', courses.length );
-        // console.log( 'activeCourses.length -> ', activeCourses.length );
-        // console.log( 'cancelledCourses.length -> ', cancelledCourses.length );
+        // console.log( 'courses.length -> ', courses.length );
+        // // console.log( 'activeCourses.length -> ', activeCourses.length );
+        // // console.log( 'cancelledCourses.length -> ', cancelledCourses.length );
 
         const languageCourses = this.classifyCoursesByLanguage( courses );
         // const activeLanguageCourses = classifyCoursesByLanguage( activeCourses );
@@ -402,7 +406,7 @@ class CelexData {
         const flag = this.getFlagData( activeFlag );
 
         languageCourses.forEach( courseByLanguage => {
-            console.log(`course l ${flag}[ ${courseByLanguage.language} ][ ${courseByLanguage.courses.length} ]`);
+            // console.log(`course l ${flag}[ ${courseByLanguage.language} ][ ${courseByLanguage.courses.length} ]`);
         });
     }
 
@@ -426,16 +430,16 @@ class CelexData {
 
         languageCoursesSchedule.forEach( courseByLanguage => {
             courseByLanguage.schedules.forEach( courseBySchedule => {
-                // console.log(`c ls ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ]`);
+                // // console.log(`c ls ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ]`);
                 courseBySchedule.courses.forEach( course => {
-                    console.log(`c lsc ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ][ ${course.titleComponents.schedule} ][ ${course.titleComponents.dateStart} ][ ${course.level} ][ ${course.publication} ][ s: ${course.students.length} ]`);
-                    // console.log(`c lsc ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ][ ${course.title} ][ ${course.level} ][ ${course.publication} ][ s: ${course.students.length} ]`);
-                    // console.log(`c lsc ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ][ ${course.level} ][ ${course.publication} ][ s: ${course.students.length} ][ ${course.title} ]`);
-                    // console.log(`course [ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.publication} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ][ s: ${course.students.length} ] `);
+                    // console.log(`c lsc ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ][ ${course.titleComponents.schedule} ][ ${course.titleComponents.dateStart} ][ ${course.level} ][ ${course.publication} ][ s: ${course.students.length} ]`);
+                    // // console.log(`c lsc ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ][ ${course.title} ][ ${course.level} ][ ${course.publication} ][ s: ${course.students.length} ]`);
+                    // // console.log(`c lsc ${flag}[ ${courseBySchedule.language} ][ ${courseBySchedule.schedule} ][ ${courseBySchedule.courses.length} ][ ${course.level} ][ ${course.publication} ][ s: ${course.students.length} ][ ${course.title} ]`);
+                    // // console.log(`course [ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.publication} ][ ${course.semester} ][ ${course.teacher} ][ ${course.classroom} ][ s: ${course.students.length} ] `);
                 });
-                console.log('-----------------------------------------------------------------------------------------------');
+                // console.log('-----------------------------------------------------------------------------------------------');
             });
-            console.log('-----------------------------------------------------------------------------------------------');
+            // console.log('-----------------------------------------------------------------------------------------------');
         });
     }
 
