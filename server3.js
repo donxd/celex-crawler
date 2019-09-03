@@ -8,3 +8,6 @@ for ( let i = 1; i <= numberRequests; i++ ){
 	data.makeRequest( i );
 }
 
+data.on('data-processed', () => {
+	console.log('data processed - OK');
+});
