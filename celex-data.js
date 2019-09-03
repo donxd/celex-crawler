@@ -185,8 +185,7 @@ class CelexData extends Events  {
         dataCourses.forEach(course => {
             this.showCourseData( course );
         });
-        // console.log('data : ', dataCourses);
-        this.emit('data-processed');
+        this.emit('data-processed', dataCourses);
     }
 
     showCourseData ( course ){
