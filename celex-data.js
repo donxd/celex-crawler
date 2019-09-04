@@ -218,17 +218,17 @@ class CelexData extends Events  {
         const studentsData = this.getStudentsData( $, course );
 
         return {
-            language: this.getDataFromPosition( data, 1 ),
+            language: this.cleanText(this.getDataFromPosition( data, 1 )),
             semester: this.getDataFromPosition( data, 3 ),
-            level: this.getDataFromPosition( data, 5 ),
+            level: this.cleanText(this.getDataFromPosition( data, 5 )),
             teacher: this.getDataFromPosition( data, 8 ),
             schedule: this.getDataFromPosition( data, 10 ),
             classroom: this.getDataFromPosition( data, 12 ),
             link : linkItem,
             publication : publicationTimeItem,
-            title : this.cleanTitleItem( titleItem ),
+            title : this.cleanTitleItem( this.cleanText( titleItem ) ),
             titleComponents : this.componentsTitle( titleItem ),
-            titleOriginal : titleItem,
+            titleOriginal : this.cleanText(titleItem),
             students: studentsData,
         };
     }
@@ -247,8 +247,12 @@ class CelexData extends Events  {
         return title;
     }
 
+    cleanText (text){
+        return Buffer.from(text, 'binary').toString(ENCODING_TEXT);
+    }
+
     componentsTitle ( titleItem ){
-        const cleanTitle = this.cleanTitleItem( titleItem );
+        const cleanTitle = this.cleanTitleItem( this.cleanText( titleItem ) );
 
         const components = cleanTitle.split( TITLE_SEPARATOR )
             .map( component => component.trim() );
@@ -300,7 +304,7 @@ class CelexData extends Events  {
         if (this.hasTextBadEncoding(dataStudentCleaned)){
             dataStudentCleaned = dataStudentCleaned.replace('ÃÂ', 'Ã', 'g'); //*?
             dataStudentCleaned = dataStudentCleaned.replace('Ã', 'Ã', 'g'); //*?
-            console.log('s x  : ', dataStudentCleaned);
+            // console.log('s x  : ', dataStudentCleaned);
             dataStudentCleaned = iconvLite.decode( dataStudentCleaned, ENCODING_TEXT, {stripBOM: false} );
             // dataStudentCleaned = dataStudentCleaned.replace('Ã', 'Ã', 'g'); //*?
             dataStudentCleaned = dataStudentCleaned.replace('A', 'Ã', 'g'); //A
