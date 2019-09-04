@@ -218,10 +218,10 @@ class CelexData extends Events  {
         const studentsData = this.getStudentsData( $, course );
 
         return {
-            language: this.cleanText(this.getDataFromPosition( data, 1 )),
+            language: this.cleanText( this.getDataFromPosition( data, 1 ) ),
             semester: this.getDataFromPosition( data, 3 ),
-            level: this.cleanText(this.getDataFromPosition( data, 5 )),
-            teacher: this.getDataFromPosition( data, 8 ),
+            level: this.cleanText( this.getDataFromPosition( data, 5 )),
+            teacher: this.cleanText( this.getDataFromPosition( data, 8 ) ),
             schedule: this.getDataFromPosition( data, 10 ),
             classroom: this.getDataFromPosition( data, 12 ),
             link : linkItem,
