@@ -4,12 +4,7 @@ const iconvLite = require('iconv-lite');
 const moment = require( 'moment' );
 const request = require( 'request' );
 const Events = require( 'events' );
-// const escapeUnicode = require('escape-unicode');
-// const { StringDecoder } = require('string_decoder');
-// const schedule = require( 'node-schedule' );
-// const Persistence = require('./persistence');
 
-// const decoder = new StringDecoder('utf8');
 let courseList = [];
 let requestProcessed = 0;
 
@@ -87,21 +82,7 @@ class CelexData extends Events  {
         let urlPagination = this.getUrlWithPagination( pagination );
         console.log( 'mensaje - realizando petición [ %s ] ', urlPagination );
 
-        // request( {url:urlPagination, encoding: 'latin1'}, ( error, response, content ) => {
-        // request( {url:urlPagination, encoding: 'utf-8'}, ( error, response, content ) => {
         request( {url:urlPagination, encoding: 'binary'}, ( error, response, content ) => {
-        // request( {url:urlPagination, encoding: 'ascii'}, ( error, response, content ) => {
-        // request( urlPagination, ( error, response, content ) => {
-            // content = iconvLite.decode( content, 'utf-8' );
-            // content = iconvLite.decode( content, 'ISO-8859-1' );
-            // content = iconvLite.decode( content, 'windows-1252' ); //x
-            // content = iconvLite.decode( content, 'win1251' ); // ?
-            // content = iconvLite.decode( content, 'win1253' ); // ?
-            // content = iconvLite.decode( Buffer.from(content, 'iso-8859-15'), 'win1253' ); // ?
-            // content = Buffer.from(content, 'iso-8859-15').toString('utf8');
-            // content = iconvLite.decode( Buffer.from(content), 'win1253' ); // ?
-            // content = toUTF8( content );
-
             this.processXMLResponse( content );
         });
     }
@@ -346,85 +327,11 @@ class CelexData extends Events  {
             // dataStudentCleaned = dataStudentCleaned.replace('Ã‰', 'É', 'g');
 
             if (this.hasTextBadEncoding(dataStudentCleaned)){
-                console.log('s i  : ', dataStudentCleaned);
-                // // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, ENCODING_TEXT, {stripBOM: false} )); // *********************
-                // // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'ISO-8859-8' )); //*
-                // // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'CP-1252' )); //*
-
-                // // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'win1252').toString('utf-8'));
-                // // console.log('s f  : ', convv.convert(dataStudentCleaned));
-                // // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'windows1252').toString('utf-8'));
-                // // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'win-1252').toString('utf-8'));
-                // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'latin1').toString('utf-8'));
-                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'windows-1252', {stripBOM: false} )); // x
-                console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, ENCODING_TEXT, {stripBOM: false} )); // *********************
-                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'iso-8859-15' )); // x
-                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'win1251' )); // x
-                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'win1252' )); // x
-                // // console.log('s f2 : ', iconvLite.decode( new Buffer(dataStudentCleaned, 'win1252') )); // x
-                // // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'win1252').toString('latin1')); // x
-                // // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'win1251').toString('latin1')); // x
-                // // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'windows1252').toString('latin1')); // x
-                // // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'win-1252').toString('latin1')); // x
-
-                // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'utf8').toString('latin1'));
-                // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'utf-8').toString('latin1'));
-                // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'latin1').toString('utf8'));
-                // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'latin1').toString('utf-8'));
-
-                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, ENCODING_TEXT ));
-                // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'binary').toString('utf8'));
-                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'ISO-8859-8' )); //*
-                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'CP-1252' )); //*
-                // console.log('s f2 : ', iconvLite.decode( Buffer.from(dataStudentCleaned), 'windows-1252' ));
+                // console.log('s i  : ', dataStudentCleaned);
+                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, ENCODING_TEXT, {stripBOM: false} )); // *********************
+                dataStudentCleaned = iconvLite.decode( dataStudentCleaned, ENCODING_TEXT, {stripBOM: false} );
             }
-
-
-            // dataStudentCleaned = dataStudentCleaned.replace('Ã', 'Á','g');
-            // dataStudentCleaned = dataStudentCleaned.replace('Ã‘', 'Ñ','g');
-
-            // iconv.extendNodeEncodings();
-
-            // const convv = new Iconv('WINDOWS-1252', 'UTF-8');
-            // const convv = new Iconv('latin1', 'utf-8');
-
-            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'win1252').toString('utf-8'));
-            // console.log('s f  : ', convv.convert(dataStudentCleaned));
-            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'windows1252').toString('utf-8'));
-            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'win-1252').toString('utf-8'));
-            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'latin1').toString('utf-8'));
-            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'windows-1252', {stripBOM: false} )); // x
-            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, ENCODING_TEXT, {stripBOM: false} )); // *********************
-            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'iso-8859-15' )); // x
-            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'win1251' )); // x
-            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'win1252' )); // x
-            // console.log('s f2 : ', iconvLite.decode( new Buffer(dataStudentCleaned, 'win1252') )); // x
-            // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'win1252').toString('latin1')); // x
-            // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'win1251').toString('latin1')); // x
-            // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'windows1252').toString('latin1')); // x
-            // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'win-1252').toString('latin1')); // x
-
-            // dataStudentCleaned = escapeUnicode(dataStudentCleaned);
-            // dataStudentCleaned = Buffer.from(dataStudentCleaned, 'utf8');
-            // dataStudentCleaned = Buffer.from(dataStudentCleaned, 'latin1').toString('utf-8'); // *
-            // dataStudentCleaned = Buffer.from(dataStudentCleaned, 'latin1').toString('utf8'); // *
-            // console.log('s f : ', dataStudentCleaned);
-            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'utf8').toString('latin1'));
-            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'utf-8').toString('latin1'));
-            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'latin1').toString('utf8'));
-            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'latin1').toString('utf-8'));
-            // dataStudentCleaned = iconvLite.decode( dataStudentCleaned, ENCODING_TEXT );
-            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, ENCODING_TEXT ));
-            // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'binary').toString('utf8'));
-            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'ISO-8859-8' )); //*
-            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'CP-1252' )); //*
-            // console.log('s f2 : ', iconvLite.decode( Buffer.from(dataStudentCleaned), 'windows-1252' ));
-            // dataStudentCleaned = Buffer.from(dataStudentCleaned).toString('latin1');
-            // dataStudentCleaned = Buffer.from(dataStudentCleaned).toString('utf-8');
-            // dataStudentCleaned = decoder.write(Buffer.from(dataStudentCleaned, 'utf8'));
-            // dataStudentCleaned = decoder.write(dataStudentCleaned);
         }
-        // dataStudent = iconvLite.decode( dataStudent, 'ISO-8859-1' );
 
         return dataStudentCleaned;
     }
@@ -434,7 +341,6 @@ class CelexData extends Events  {
             if ( data.indexOf( x ) !== -1 ) return true;
         }
         return false;
-        // return data.indexOf( BAD_ENCODING_SYMBOL ) !== -1;
     }
 
     orderCourseList (){
