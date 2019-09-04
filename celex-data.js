@@ -1,12 +1,15 @@
 const cheerio = require( 'cheerio' );
-const iconv = require( 'iconv' );
+const Iconv = require( 'iconv' ).Iconv;
 const iconvLite = require('iconv-lite');
 const moment = require( 'moment' );
 const request = require( 'request' );
 const Events = require( 'events' );
+// const escapeUnicode = require('escape-unicode');
+// const { StringDecoder } = require('string_decoder');
 // const schedule = require( 'node-schedule' );
 // const Persistence = require('./persistence');
 
+// const decoder = new StringDecoder('utf8');
 let courseList = [];
 let requestProcessed = 0;
 
@@ -21,7 +24,7 @@ const TAG_LINK_ITEM = 'link';
 const TAG_CONTENT_ITEM = 'content\\:encoded';
 const TAG_PUBLICATION_ITEM = 'pubDate';
 
-const TAG_LIST_COURSES = 'table';
+const TAG_LIST_COURSES = 'table.table';
 const TAG_DATA_TITLE = 'th';
 const TAG_LIST_DATA = 'tr';
 const TAG_DATA_INFO = 'td';
@@ -37,6 +40,7 @@ const TITLE_SEPARATOR = '–';
 const ENCODING_TEXT = 'utf-8';
 
 const BAD_ENCODING_SYMBOL = 'Ã';
+const BAD_ENCODING_SYMBOLS = ['Ã', '', '', '‘'];
 const REPEATED_SPACE = new RegExp( /[ ]+/, 'g');
 
 const SINGLE_SPACE_FOR_STUDENT_NAME = ' ';
@@ -81,11 +85,21 @@ class CelexData extends Events  {
 
     makeRequest ( pagination ){
         let urlPagination = this.getUrlWithPagination( pagination );
-        // console.log( 'mensaje - realizando petición [ %s ] ', urlPagination );
+        console.log( 'mensaje - realizando petición [ %s ] ', urlPagination );
 
-        request( urlPagination, ( error, response, content ) => {
+        // request( {url:urlPagination, encoding: 'latin1'}, ( error, response, content ) => {
+        // request( {url:urlPagination, encoding: 'utf-8'}, ( error, response, content ) => {
+        request( {url:urlPagination, encoding: 'binary'}, ( error, response, content ) => {
+        // request( {url:urlPagination, encoding: 'ascii'}, ( error, response, content ) => {
+        // request( urlPagination, ( error, response, content ) => {
             // content = iconvLite.decode( content, 'utf-8' );
             // content = iconvLite.decode( content, 'ISO-8859-1' );
+            // content = iconvLite.decode( content, 'windows-1252' ); //x
+            // content = iconvLite.decode( content, 'win1251' ); // ?
+            // content = iconvLite.decode( content, 'win1253' ); // ?
+            // content = iconvLite.decode( Buffer.from(content, 'iso-8859-15'), 'win1253' ); // ?
+            // content = Buffer.from(content, 'iso-8859-15').toString('utf8');
+            // content = iconvLite.decode( Buffer.from(content), 'win1253' ); // ?
             // content = toUTF8( content );
 
             this.processXMLResponse( content );
@@ -296,15 +310,131 @@ class CelexData extends Events  {
     getCleanDataStudent ( dataStudent ){
         // // console.log(`=======>${dataStudent}<=======`);
 
-        // dataStudent = toUTF8( dataStudent );
+        // dataStudent = this.toUTF8( dataStudent );
         let dataStudentCleaned = dataStudent.trim().replace( REPEATED_SPACE, SINGLE_SPACE_FOR_STUDENT_NAME );
+        // dataStudentCleaned = iconvLite.decode( dataStudentCleaned, ENCODING_TEXT );
 
-        if ( dataStudentCleaned.indexOf( BAD_ENCODING_SYMBOL ) !== -1 ){
-            dataStudentCleaned = iconvLite.decode( dataStudentCleaned, ENCODING_TEXT );
+        // if ( dataStudentCleaned.indexOf( BAD_ENCODING_SYMBOL ) !== -1 ){
+        // console.log('s i* : ', dataStudentCleaned);
+        if (this.hasTextBadEncoding(dataStudentCleaned)){
+            dataStudentCleaned = dataStudentCleaned.replace('ÃÂ', 'Ã', 'g'); //*?
+            dataStudentCleaned = dataStudentCleaned.replace('Ã', 'Ã', 'g'); //*?
+            console.log('s x  : ', dataStudentCleaned);
+            dataStudentCleaned = iconvLite.decode( dataStudentCleaned, ENCODING_TEXT, {stripBOM: false} );
+            // dataStudentCleaned = dataStudentCleaned.replace('Ã', 'Ã', 'g'); //*?
+            dataStudentCleaned = dataStudentCleaned.replace('A', 'Ã', 'g'); //A
+            dataStudentCleaned = dataStudentCleaned.replace('Á', 'Ã', 'g'); //A
+            dataStudentCleaned = dataStudentCleaned.replace('Á', 'Ã', 'g'); //A *
+            dataStudentCleaned = dataStudentCleaned.replace('I', 'Ã', 'g'); //I
+            dataStudentCleaned = dataStudentCleaned.replace('Í', 'Ã', 'g'); //I
+            dataStudentCleaned = dataStudentCleaned.replace('Í', 'Ã', 'g'); //I *
+            dataStudentCleaned = dataStudentCleaned.replace('Ã', 'Ã', 'g'); //*?
+            dataStudentCleaned = dataStudentCleaned.replace('ÍA', 'ÃA', 'g'); //*??
+            dataStudentCleaned = dataStudentCleaned.replace('Ã‰', 'Ã', 'g'); //E
+            dataStudentCleaned = dataStudentCleaned.replace('É', 'Ã', 'g'); //E
+            dataStudentCleaned = dataStudentCleaned.replace('É', 'Ã', 'g'); //E *
+            dataStudentCleaned = dataStudentCleaned.replace('Ã‘', 'Ã', 'g'); //N
+            dataStudentCleaned = dataStudentCleaned.replace('Ñ', 'Ã', 'g'); //N
+            dataStudentCleaned = dataStudentCleaned.replace('Ñ', 'Ã', 'g'); //N*
+            dataStudentCleaned = dataStudentCleaned.replace('Ã“', 'Ã', 'g'); //O
+            dataStudentCleaned = dataStudentCleaned.replace('Ó', 'Ã', 'g'); //O
+            dataStudentCleaned = dataStudentCleaned.replace('Ó', 'Ã', 'g'); //O
+            dataStudentCleaned = dataStudentCleaned.replace('Ãš', 'Ã', 'g'); //U
+            dataStudentCleaned = dataStudentCleaned.replace('Ú', 'Ã', 'g'); //U
+            dataStudentCleaned = dataStudentCleaned.replace('Ú', 'Ã', 'g'); //U*
+            // dataStudentCleaned = dataStudentCleaned.replace('I', 'Í', 'g');
+            // dataStudentCleaned = dataStudentCleaned.replace('Ã‰', 'É', 'g');
+
+            if (this.hasTextBadEncoding(dataStudentCleaned)){
+                console.log('s i  : ', dataStudentCleaned);
+                // // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, ENCODING_TEXT, {stripBOM: false} )); // *********************
+                // // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'ISO-8859-8' )); //*
+                // // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'CP-1252' )); //*
+
+                // // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'win1252').toString('utf-8'));
+                // // console.log('s f  : ', convv.convert(dataStudentCleaned));
+                // // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'windows1252').toString('utf-8'));
+                // // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'win-1252').toString('utf-8'));
+                // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'latin1').toString('utf-8'));
+                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'windows-1252', {stripBOM: false} )); // x
+                console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, ENCODING_TEXT, {stripBOM: false} )); // *********************
+                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'iso-8859-15' )); // x
+                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'win1251' )); // x
+                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'win1252' )); // x
+                // // console.log('s f2 : ', iconvLite.decode( new Buffer(dataStudentCleaned, 'win1252') )); // x
+                // // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'win1252').toString('latin1')); // x
+                // // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'win1251').toString('latin1')); // x
+                // // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'windows1252').toString('latin1')); // x
+                // // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'win-1252').toString('latin1')); // x
+
+                // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'utf8').toString('latin1'));
+                // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'utf-8').toString('latin1'));
+                // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'latin1').toString('utf8'));
+                // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'latin1').toString('utf-8'));
+
+                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, ENCODING_TEXT ));
+                // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'binary').toString('utf8'));
+                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'ISO-8859-8' )); //*
+                // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'CP-1252' )); //*
+                // console.log('s f2 : ', iconvLite.decode( Buffer.from(dataStudentCleaned), 'windows-1252' ));
+            }
+
+
+            // dataStudentCleaned = dataStudentCleaned.replace('Ã', 'Á','g');
+            // dataStudentCleaned = dataStudentCleaned.replace('Ã‘', 'Ñ','g');
+
+            // iconv.extendNodeEncodings();
+
+            // const convv = new Iconv('WINDOWS-1252', 'UTF-8');
+            // const convv = new Iconv('latin1', 'utf-8');
+
+            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'win1252').toString('utf-8'));
+            // console.log('s f  : ', convv.convert(dataStudentCleaned));
+            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'windows1252').toString('utf-8'));
+            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'win-1252').toString('utf-8'));
+            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'latin1').toString('utf-8'));
+            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'windows-1252', {stripBOM: false} )); // x
+            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, ENCODING_TEXT, {stripBOM: false} )); // *********************
+            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'iso-8859-15' )); // x
+            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'win1251' )); // x
+            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'win1252' )); // x
+            // console.log('s f2 : ', iconvLite.decode( new Buffer(dataStudentCleaned, 'win1252') )); // x
+            // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'win1252').toString('latin1')); // x
+            // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'win1251').toString('latin1')); // x
+            // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'windows1252').toString('latin1')); // x
+            // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'win-1252').toString('latin1')); // x
+
+            // dataStudentCleaned = escapeUnicode(dataStudentCleaned);
+            // dataStudentCleaned = Buffer.from(dataStudentCleaned, 'utf8');
+            // dataStudentCleaned = Buffer.from(dataStudentCleaned, 'latin1').toString('utf-8'); // *
+            // dataStudentCleaned = Buffer.from(dataStudentCleaned, 'latin1').toString('utf8'); // *
+            // console.log('s f : ', dataStudentCleaned);
+            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'utf8').toString('latin1'));
+            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'utf-8').toString('latin1'));
+            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'latin1').toString('utf8'));
+            // console.log('s f  : ', Buffer.from(dataStudentCleaned, 'latin1').toString('utf-8'));
+            // dataStudentCleaned = iconvLite.decode( dataStudentCleaned, ENCODING_TEXT );
+            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, ENCODING_TEXT ));
+            // console.log('s f2 : ', new Buffer(dataStudentCleaned, 'binary').toString('utf8'));
+            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'ISO-8859-8' )); //*
+            // console.log('s f2 : ', iconvLite.decode( dataStudentCleaned, 'CP-1252' )); //*
+            // console.log('s f2 : ', iconvLite.decode( Buffer.from(dataStudentCleaned), 'windows-1252' ));
+            // dataStudentCleaned = Buffer.from(dataStudentCleaned).toString('latin1');
+            // dataStudentCleaned = Buffer.from(dataStudentCleaned).toString('utf-8');
+            // dataStudentCleaned = decoder.write(Buffer.from(dataStudentCleaned, 'utf8'));
+            // dataStudentCleaned = decoder.write(dataStudentCleaned);
         }
         // dataStudent = iconvLite.decode( dataStudent, 'ISO-8859-1' );
 
         return dataStudentCleaned;
+    }
+
+    hasTextBadEncoding (data){
+        for (let x of BAD_ENCODING_SYMBOLS) {
+            if ( data.indexOf( x ) !== -1 ) return true;
+        }
+        return false;
+        // return data.indexOf( BAD_ENCODING_SYMBOL ) !== -1;
     }
 
     orderCourseList (){
@@ -326,6 +456,7 @@ class CelexData extends Events  {
     }
 
     organizeInformation ( dataCourses ){
+        // console.log('processData : ', JSON.stringify(dataCourses));
         this.sortOrderCourses( dataCourses );
 
         const courses = this.cloneArrayData( dataCourses );
@@ -511,13 +642,13 @@ class CelexData extends Events  {
         return `c[ ${course.language} ][ ${course.level} ][ ${course.schedule} ][ ${course.publication} ]`;
     }
 
-    // toUTF8 ( body ){
-    //   // convert from iso-8859-1 to utf-8
-    //   var ic = new iconv.Iconv( 'iso-8859-1', 'utf-8' );
-    //   var buf = ic.convert( body );
+    toUTF8 ( body ){
+      // convert from iso-8859-1 to utf-8
+      let ic = new iconv.Iconv( 'iso-8859-1', 'utf-8' );
+      let buf = ic.convert( body );
 
-    //   return buf.toString('utf-8');
-    // }
+      return buf.toString('utf-8');
+    }
 }
 
 module.exports = CelexData;
