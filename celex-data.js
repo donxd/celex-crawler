@@ -80,7 +80,7 @@ class CelexData extends Events  {
 
     makeRequest ( pagination ){
         let urlPagination = this.getUrlWithPagination( pagination );
-        console.log( 'mensaje - realizando petición [ %s ] ', urlPagination );
+        // console.log( 'mensaje - realizando petición [ %s ] ', urlPagination );
 
         request( {url:urlPagination, encoding: 'binary'}, ( error, response, content ) => {
             this.processXMLResponse( content );
@@ -297,14 +297,17 @@ class CelexData extends Events  {
 
         // dataStudent = this.toUTF8( dataStudent );
         let dataStudentCleaned = dataStudent.trim().replace( REPEATED_SPACE, SINGLE_SPACE_FOR_STUDENT_NAME );
+        dataStudentCleaned = dataStudentCleaned.replace('Âº', '', 'g');
+        dataStudentCleaned = dataStudentCleaned.replace('|', '', 'g');
         // dataStudentCleaned = iconvLite.decode( dataStudentCleaned, ENCODING_TEXT );
 
         // if ( dataStudentCleaned.indexOf( BAD_ENCODING_SYMBOL ) !== -1 ){
         // console.log('s i* : ', dataStudentCleaned);
         if (this.hasTextBadEncoding(dataStudentCleaned)){
+            // console.log('s x  : ', dataStudentCleaned);
+
             dataStudentCleaned = dataStudentCleaned.replace('ÃÂ', 'Ã', 'g'); //*?
             dataStudentCleaned = dataStudentCleaned.replace('Ã', 'Ã', 'g'); //*?
-            // console.log('s x  : ', dataStudentCleaned);
             dataStudentCleaned = iconvLite.decode( dataStudentCleaned, ENCODING_TEXT, {stripBOM: false} );
             // dataStudentCleaned = dataStudentCleaned.replace('Ã', 'Ã', 'g'); //*?
             dataStudentCleaned = dataStudentCleaned.replace('A', 'Ã', 'g'); //A
