@@ -15,7 +15,9 @@
     "iconv": "^2.3.0",
     "iconv-lite": "^0.5.0",
     "moment": "^2.22.2",
+    "mysql2": "^1.7.0",
     "node-schedule": "^1.2.5",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "sequelize": "^5.18.1"
   }
 }
