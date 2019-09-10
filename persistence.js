@@ -141,16 +141,16 @@ class Persistence {
     }
 
     analyzeGroups (groupsProcess) {
+        // groupsProcess.forEach(group => console.log('*** : ', group.dataValues));
+        // groupsProcess.forEach(group => console.log('*** : ', group.dataValues));
+        // groupsProcess.forEach(group => console.log('*** : ', group.toJSON()));
         console.log('# groupsProcess : ', groupsProcess.length);
-        // groupsProcess.forEach(group => console.log('*** : ', group.dataValues));
-        // groupsProcess.forEach(group => console.log('*** : ', group.dataValues));
-        groupsProcess.forEach(group => console.log('*** : ', group.toJSON()));
     }
 
     getGroupsProcess (groups, tx) {
         // const groupsControl = this.getGroupsControl(groups);
-        // const filter = this.getGroupsFilter(groups);
-        const filter = this.getGroupsFilter([groups[0]]);
+        const filter = this.getGroupsFilter(groups);
+        // const filter = this.getGroupsFilter([groups[0]]);
         filter.lock = true;
         filter.transaction = tx;
         filter.include = [
