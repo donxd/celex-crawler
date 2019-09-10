@@ -49,7 +49,7 @@ class Persistence {
             let processTeachers = this.processTeachers(teachers, dataTeachers);
             let processStudents = this.processStudents(students, dataStudents);
 
-            this.generateNewInfo(processCourses, processGrades, processTeachers, processStudents, sequelize)
+            this.generateNewInfo(processCourses, processGrades, processTeachers, processStudents, sequelize, data)
                 .then(res => console.log('transaction - done') || sequelize.close())
                 .catch(err => console.log('transaction - error : ', err) || sequelize.close());
         }).catch(err => console.log('error : ', err) || sequelize.close());
@@ -74,20 +74,195 @@ class Persistence {
         // }).catch(err => console.log('error : ', err));
     }
 
-    generateNewInfo (processCourses, processGrades, processTeachers, processStudents, sequelize) {
+    generateNewInfo (processCourses, processGrades, processTeachers, processStudents, sequelize, data) {
         // console.log('processCourses => ', processCourses);
         // console.log('processGrades => ', processGrades);
         // console.log('processTeachers => ', processTeachers);
         // console.log('processStudents => ', processStudents);
-        return sequelize.transaction(tx => Promise.all([
+        return sequelize.transaction().then(tx => Promise.all([
             this.createNewCourses(processCourses, tx),
             this.createNewGrades(processGrades, tx),
             this.createNewTeachers(processTeachers, tx),
             this.createNewStudents(processStudents, tx),
         ]).then(([newCourses, newGrades, newTeachers, newStudents]) => {
-            console.log('new data - done');
+            // console.log('newCourses : ', newCourses);
+            this.joinNewData(processCourses, newCourses, this.processCourses);
+            this.joinNewData(processGrades, newGrades, this.processGrades);
+            this.joinNewData(processTeachers, newTeachers, this.processTeachers);
+            this.joinNewData(processStudents, newStudents, this.processStudents);
+            // console.log('persistedAllCourses : ', processCourses.persisted);
+            // console.log('persistedAllGrades : ', processGrades.persisted);
+            // console.log('persistedAllTeachers : ', processTeachers.persisted);
+            // console.log('persistedAllStudents : ', processStudents.persisted);
             return new Promise(solve => solve());
+        }).then(async() => {
+            const groups = await this.getGroups(processCourses, processGrades, processTeachers, processStudents, data, tx);
+            // console.log('@@ groups size : ', groups.size);
+            // tx.rollback();
+            // console.log('new data - x done');
+            tx.commit();
+            console.log('new data - done');
+        }).catch(err => {
+            tx.rollback();
+            console.log('new data - undone - err : ', err);
         }));
+    }
+
+    getGroups (processCourses, processGrades, processTeachers, processStudents, data, tx) {
+        const dataPersisted = this.getDataPersisted(processCourses, processGrades, processTeachers, processStudents);
+        const groups = [];
+        let count = 0;
+        for (let group of data) {
+            groups.push(this.buildGroup(dataPersisted, group));
+            if (count++>9) break;
+        }
+
+        // const newGroups = this.getNewGroups(groups);
+        return this.getNewGroups(groups)
+            .then(newGroups => this.createNewGroups(newGroups, tx));
+        // console.log('# groups : ', groups.length);
+        // // groups.forEach(group => console.log('@ group : ', `${group.idCourse}.${group.idGrade}.${group.idTeacher}.${group.bimester}.${group.schedule}.${group.publication}.${group.classroom}`));
+        // // groups.forEach(group => console.log('* group : ', `${group.idCourse}.${group.idGrade}.${group.idTeacher}.${group.bimester}`));
+        // // console.log('groups : ', groups.map(group => `${group.idCourse}.${group.idGrade}.${group.idTeacher}.${group.bimester}`));
+        // // console.log('groups : ', groups.map(group => `${group.idCourse}.${group.idGrade}.${group.idTeacher}.${group.bimester}`));
+        // console.log('# groups unique : ', groups.reduce((acc, group) =>
+        //     // console.log('gg : ', group) || 
+        //     // console.log('gg : ', group.toJSON()) || 
+        //     // acc.add(`${group.get('idCourse')}.${group.get('idGrade')}.${group.get('idTeacher')}.${group.get('bimester')}`)
+
+        //     // acc.add(`${group.idCourse}.${group.idGrade}.${group.idTeacher}.${group.bimester}`)
+        //     acc.add(`${group.idCourse}.${group.idGrade}.${group.idTeacher}.${group.bimester}.${group.schedule}`)
+        // , new Set()).size);
+        // console.log('# groups unique : ', groups.reduce((acc, group) => acc.add(`${group.idCourse}.${group.idGrade}.${group.idTeacher}.${group.bimester}`), new Set()));
+        // return groups;
+        // return newGroups;
+    }
+
+    createNewGroups (newGroups, tx) {
+        let data = Array.from(newGroups.values()).map(newGroup => {
+            delete newGroup.grouper;
+            // newGroup.students = newGroup.students.map(student => ({idStudent: student, name: ''}));
+            // newGroup.relationStudents = newGroup.students.map(student => ({idGroup: 1, idStudent: student}));
+            newGroup.relationStudents = newGroup.students.map(student => ({idStudent: student}));
+            return newGroup;
+        });
+
+        // console.log('data group create : ', Array.from(newGroups.keys()));
+        // console.log('data group create : ', Array.from(newGroups.values()));
+        // console.log('data group create : ', data);
+        // data.forEach(group => console.log('group relation students : ', group.relationStudents));
+        const createGroups = data.map(group => this.Group.create(group, {transaction: tx, include: [ {association: this.Group.RelationStudent} ]}));
+        // const createGroups = data.map(group => this.Group.create(group, {transaction: tx, include: [ this.Group.GroupStudent ]}));
+        // const createGroups = data.map(group => this.Group.create(group, {transaction: tx, include: [ this.GroupRGroupStudent ]}));
+        // const createGroups = data.map(group => this.Group.create(group, {transaction: tx, include: [ this.GroupStudent ]}));
+        // const createGroups = data.map(group => this.Group.create(group, {transaction: tx, include: [ {association: this.GroupStudent, as: 'students'} ]}));
+        // const createGroups = data.map(group => this.Group.create(group, {transaction: tx}));
+
+        // return Promise.all([...createGroups]).then(results => {
+        return Promise.all(createGroups).then(results => {
+            console.log('# results : ', results.length);
+            // Promise.
+        }).catch(err => console.log('error insert group : ', err));
+        // Promise.all(createGroups).then(results => ).catch(err => console.log(''))
+
+        // return this.Group.bulkCreate(data, {transaction: tx, include: [ this.GroupStudent ]});
+        // return this.Group.bulkCreate(data, {transaction: tx, include: [{model: this.groupStudent, as: ''}]});
+        // return this.Group.bulkCreate(Array.from(newGroups), {transaction: tx});
+    }
+
+    getNewGroups (groups) {
+        const groupsControl = this.getGroupsControl(groups);
+
+        return this.Group.findAll(this.getGroupsFilter(groups))
+            .then(groupsPersisted => this.reduceGroups(groupsPersisted, groupsControl))
+            // .then(() => Promise.resolve(groupsControl));
+            .then(() => groupsControl);
+    }
+
+    reduceGroups (groupsPersisted, groupsControl) {
+        return new Promise(solve => {
+            // console.log('* groups size : ', groupsControl.size);
+            for (let groupPersisted of groupsPersisted) {
+                let grouper = this.getGrouper(groupPersisted.dataValues);
+                groupsControl.delete(grouper);
+            }
+            // console.log('@ groups size : ', groupsControl.size);
+            solve();
+        });
+    }
+
+    getGrouper (group) {
+        return `${group.idCourse}.${group.idGrade}.${group.idTeacher}.${group.bimester}.${group.schedule}`;
+    }
+
+    getGroupsControl (groups) {
+        return groups.reduce((acc, group) =>
+            acc.set(this.getGrouper(group), group)
+        , new Map());
+    }
+
+    getGroupsFilter (groups) {
+        return {
+            where: {
+                [Op.or]: groups.map(group => ({
+                    idCourse: group.idCourse,
+                    idGrade: group.idGrade,
+                    idTeacher: group.idTeacher,
+                    bimester: group.bimester,
+                    schedule: group.schedule
+                }))
+            }
+        };
+    }
+
+    buildGroup (dataPersisted, group) {
+        const dataGroup = {
+            // idGroup: null,
+            schedule: group.schedule,
+            publication: group.publication,
+            bimester: group.semester,
+            classroom: group.classroom,
+            idCourse: this.getIdCourse(dataPersisted.courses, group.language),
+            idGrade: this.getIdGrade(dataPersisted.grades, group.level),
+            idTeacher: this.getIdTeacher(dataPersisted.teachers, group.teacher),
+            students: this.getGroupStudents(dataPersisted.students, group.students),
+        };
+        dataGroup.grouper = this.getGrouper(dataGroup);
+        // dataGroup.grouper = this.getGrouper: `${dataGroup.idCourse}.${dataGroup.idGrade}.${dataGroup.idTeacher}.${dataGroup.bimester}.${dataGroup.schedule}`;
+        // console.log('* group : ', dataGroup);
+
+        // return this.GroupStudent.build(dataGroup);
+        return dataGroup;
+    }
+
+    getGroupStudents (persistedStudents, students) {
+        return students.map(student => persistedStudents.get(student).idStudent);
+    }
+
+    getIdCourse (persistedCourses, language) {
+        return persistedCourses.get(language).idCourse;
+    }
+
+    getIdGrade (persistedGrades, grade) {
+        return persistedGrades.get(grade).idGrade;
+    }
+
+    getIdTeacher (persistedTeachers, teacher) {
+        return persistedTeachers.get(teacher).idTeacher;
+    }
+
+    getDataPersisted (processCourses, processGrades, processTeachers, processStudents) {
+        return {
+            courses : processCourses.persisted,
+            grades : processGrades.persisted,
+            teachers : processTeachers.persisted,
+            students : processStudents.persisted
+        };
+    }
+
+    joinNewData (persistedData, newPersisted, processPersistence) {
+        persistedData.persisted = new Map([...persistedData.persisted, ...(processPersistence(newPersisted, new Set())).persisted]);
+        persistedData.newData.clear();
     }
 
     createNewCourses (processCourses, tx) {
@@ -105,6 +280,12 @@ class Persistence {
     createNewTeachers (processTeachers, tx) {
         let data = Array.from(processTeachers.newData).map(element => ({name: element}));
         return this.Teacher.bulkCreate(data, {transaction: tx});
+        // return this.Teacher.bulkCreate(data, {transaction: tx}).then(res => new Promise(solve => {
+        //     console.log('undone - pre');
+        //     tx.rollback();
+        //     console.log('undone - ok');
+        //     solve();
+        // }));
         // return new Promise(solve => console.log('message 3') || solve());
     }
 
@@ -251,9 +432,10 @@ class Persistence {
         // this.Group.hasOne(this.Course);
         // this.Group.hasOne(this.Grade);
         // this.Group.hasOne(this.Teacher);
-        this.Group.belongsTo(this.Course, {foreignKey: 'id_course'});
-        this.Group.belongsTo(this.Grade, {foreignKey: 'id_grade'});
-        this.Group.belongsTo(this.Teacher, {foreignKey: 'id_teacher'});
+        this.GroupCourse = this.Group.belongsTo(this.Course, {as: 'course', foreignKey: 'id_course'});
+        this.GroupGrade = this.Group.belongsTo(this.Grade, {as: 'grade', foreignKey: 'id_grade'});
+        this.GroupTeacher = this.Group.belongsTo(this.Teacher, {as: 'teacher', foreignKey: 'id_teacher'});
+
         this.GroupStudent = this.configEntityGroupStudent(sequelize);
         this.GroupStudent.removeAttribute('id');
         // this.GroupStudent.belongsToMany(this.Group);
@@ -267,7 +449,15 @@ class Persistence {
         //     }
         // });
         // this.Student.belongsTo(this.Group, {as: 'Group', through: 'GroupStudent'});
-        this.Student.belongsToMany(this.Group, {as: 'Group', through: 'GroupStudent'});
+        // this.Group.hasMany(this.Student, {as: 'students', foreignKey: 'id_teacher'});
+        // this.Group.hasMany(this.Student, {as: 'Students', through: 'GroupStudent'});
+
+        // this.Group.GroupStudent = this.Group.belongsToMany(this.GroupStudent, {as: 'relationStudents', foreignKey: 'id_group'});
+        this.Group.RelationStudent = this.Group.hasMany(this.GroupStudent, {as: 'relationStudents', foreignKey: 'id_group'});
+        // this.Group.GroupStudent = this.Group.belongsTo(this.GroupStudent, {as: 'relationStudents', foreignKey: 'id_group'});
+
+        this.GroupStudent = this.Group.belongsToMany(this.Student, {as: 'students', through: 'GroupStudent', foreignKey: 'idGroup'});
+        this.StudentGroup = this.Student.belongsToMany(this.Group, {as: 'groups', through: 'GroupStudent', foreignKey: 'idStudent'});
     }
 
     configEntityCourses (sequelize) {
@@ -377,11 +567,11 @@ class Persistence {
     }
     configEntityGroupStudent (sequelize) {
         return sequelize.define('groupStudent', {
-            idGroup : {
-                field: 'id_group',
-                type: DataTypes.INTEGER,
-                allowNull: false
-            },
+            // idGroup : {
+            //     field: 'id_group',
+            //     type: DataTypes.INTEGER,
+            //     allowNull: false
+            // },
             idStudent : { 
                 field: 'id_student',
                 type: DataTypes.INTEGER,
