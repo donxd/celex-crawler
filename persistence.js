@@ -111,15 +111,17 @@ class Persistence {
     getGroups (processCourses, processGrades, processTeachers, processStudents, data, tx) {
         const dataPersisted = this.getDataPersisted(processCourses, processGrades, processTeachers, processStudents);
         const groups = [];
-        let count = 0;
+        // let count = 0;
         for (let group of data) {
             groups.push(this.buildGroup(dataPersisted, group));
-            if (count++>9) break;
+            // if (count++>9) break;
         }
 
         // const newGroups = this.getNewGroups(groups);
         return this.getNewGroups(groups)
-            .then(newGroups => this.createNewGroups(newGroups, tx));
+            .then(newGroups => this.createNewGroups(newGroups, tx))
+            .then(groupsPersisted => this.getGroupsProcess(groups, tx))
+            .then(groupsProcess => this.analyzeGroups(groupsProcess));
         // console.log('# groups : ', groups.length);
         // // groups.forEach(group => console.log('@ group : ', `${group.idCourse}.${group.idGrade}.${group.idTeacher}.${group.bimester}.${group.schedule}.${group.publication}.${group.classroom}`));
         // // groups.forEach(group => console.log('* group : ', `${group.idCourse}.${group.idGrade}.${group.idTeacher}.${group.bimester}`));
@@ -138,6 +140,35 @@ class Persistence {
         // return newGroups;
     }
 
+    analyzeGroups (groupsProcess) {
+        console.log('# groupsProcess : ', groupsProcess.length);
+        // groupsProcess.forEach(group => console.log('*** : ', group.dataValues));
+        // groupsProcess.forEach(group => console.log('*** : ', group.dataValues));
+        groupsProcess.forEach(group => console.log('*** : ', group.toJSON()));
+    }
+
+    getGroupsProcess (groups, tx) {
+        // const groupsControl = this.getGroupsControl(groups);
+        // const filter = this.getGroupsFilter(groups);
+        const filter = this.getGroupsFilter([groups[0]]);
+        filter.lock = true;
+        filter.transaction = tx;
+        filter.include = [
+            this.GroupCourse,
+            this.GroupGrade,
+            this.GroupTeacher,
+            this.Group.Student
+            // this.StudentGroup
+            // this.GroupStudent
+            // {
+            //     // model: this.GroupStudent
+            //     model: this.Group.Student
+            // }
+        ];
+
+        return this.Group.findAll(filter);
+    }
+
     createNewGroups (newGroups, tx) {
         let data = Array.from(newGroups.values()).map(newGroup => {
             delete newGroup.grouper;
@@ -147,11 +178,16 @@ class Persistence {
             return newGroup;
         });
 
+        // const createGroups = data.map(group => this.Group.create(group, {transaction: tx, include: [ {association: this.Group.RelationStudent} ]}));
+        // return Promise.all(createGroups).then(results => {
+        //     console.log('# results : ', results.length);
+        //     // Promise.
+        // }).catch(err => console.log('error insert group : ', err));
+
         // console.log('data group create : ', Array.from(newGroups.keys()));
         // console.log('data group create : ', Array.from(newGroups.values()));
         // console.log('data group create : ', data);
         // data.forEach(group => console.log('group relation students : ', group.relationStudents));
-        const createGroups = data.map(group => this.Group.create(group, {transaction: tx, include: [ {association: this.Group.RelationStudent} ]}));
         // const createGroups = data.map(group => this.Group.create(group, {transaction: tx, include: [ this.Group.GroupStudent ]}));
         // const createGroups = data.map(group => this.Group.create(group, {transaction: tx, include: [ this.GroupRGroupStudent ]}));
         // const createGroups = data.map(group => this.Group.create(group, {transaction: tx, include: [ this.GroupStudent ]}));
@@ -159,14 +195,14 @@ class Persistence {
         // const createGroups = data.map(group => this.Group.create(group, {transaction: tx}));
 
         // return Promise.all([...createGroups]).then(results => {
-        return Promise.all(createGroups).then(results => {
-            console.log('# results : ', results.length);
-            // Promise.
-        }).catch(err => console.log('error insert group : ', err));
         // Promise.all(createGroups).then(results => ).catch(err => console.log(''))
 
         // return this.Group.bulkCreate(data, {transaction: tx, include: [ this.GroupStudent ]});
-        // return this.Group.bulkCreate(data, {transaction: tx, include: [{model: this.groupStudent, as: ''}]});
+        // return this.Group.bulkCreate(data, {transaction: tx, include: [ {association: this.Group.RelationStudent} ] }).then(results => {
+        //     console.log('# results : ', results.length);
+        //     console.log('@ results : ', results.map(result => result.dataValues));
+        // });
+        return this.Group.bulkCreate(data, {transaction: tx, include: [ {association: this.Group.RelationStudent} ] });
         // return this.Group.bulkCreate(Array.from(newGroups), {transaction: tx});
     }
 
@@ -409,6 +445,7 @@ class Persistence {
             define: {
                 timestamps: false
             },
+            isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED,
             // pool: {
             //     max: 500,
             //     min: 0,
@@ -456,8 +493,21 @@ class Persistence {
         this.Group.RelationStudent = this.Group.hasMany(this.GroupStudent, {as: 'relationStudents', foreignKey: 'id_group'});
         // this.Group.GroupStudent = this.Group.belongsTo(this.GroupStudent, {as: 'relationStudents', foreignKey: 'id_group'});
 
-        this.GroupStudent = this.Group.belongsToMany(this.Student, {as: 'students', through: 'GroupStudent', foreignKey: 'idGroup'});
-        this.StudentGroup = this.Student.belongsToMany(this.Group, {as: 'groups', through: 'GroupStudent', foreignKey: 'idStudent'});
+        // this.Group.Student = this.Group.belongsToMany(this.Student, {as: 'students', through: 'GroupStudent', foreignKey: 'idGroup'}); 
+        // this.Group.Student = this.Group.belongsToMany(this.Student, {as: 'students', through: this.GroupStudent, foreignKey: 'idGroup'}); 
+        // this.Group.Student = this.Group.belongsToMany(this.Student, {as: 'students', through: this.GroupStudent}); 
+        // this.Group.Student = this.Group.belongsToMany(this.Student, {as: 'students', through: 'group_student', foreignKey: 'id_group'}); 
+        this.Group.Student = this.Group.belongsToMany(this.Student, {as: 'students', through: this.GroupStudent, foreignKey: 'id_group', otherKey: 'id_student'}); 
+
+
+
+        // this.StudentGroup = this.Student.belongsToMany(this.Group, {as: 'groups', through: 'GroupStudent', foreignKey: 'idStudent'});
+        // this.Group.Student = this.Group.belongsToMany(this.Student, {as: 'students', through: 'group_student', foreignKey: 'id_group'});
+        // this.StudentGroup = this.Student.belongsToMany(this.Group, {as: 'groups', through: 'group_student', foreignKey: 'id_student'});
+        // this.Group.Student = this.Group.belongsToMany(this.Student, {as: 'students', through: this.GroupStudent});
+        // this.Group.Student = this.Group.belongsToMany(this.Student, {as: 'students', through: this.GroupStudent, foreignKey: 'id_student'});
+        // this.Group.Student = this.Group.belongsToMany(this.Student, {as: 'students', through: this.GroupStudent, foreignKey: 'idStudent'});
+        // this.StudentGroup = this.Student.belongsToMany(this.Group, {as: 'groups', through: 'group_student', foreignKey: 'idStudent'});
     }
 
     configEntityCourses (sequelize) {
