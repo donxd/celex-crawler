@@ -222,7 +222,7 @@ class CelexData extends Events  {
             semester: this.getDataFromPosition( data, 3 ),
             level: this.cleanText( this.getDataFromPosition( data, 5 )),
             teacher: this.cleanText( this.getDataFromPosition( data, 8 ) ),
-            schedule: this.getDataFromPosition( data, 10 ),
+            schedule: this.cleanText( this.getDataFromPosition( data, 10 ) ),
             classroom: this.getDataFromPosition( data, 12 ),
             link : linkItem,
             publication : publicationTimeItem,
