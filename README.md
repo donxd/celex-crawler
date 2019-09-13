@@ -1,29 +1,17 @@
-# README #
+# CELEX - Crawler
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Project to process [CELEX courses](https://celexupiicsa.info/) information and leave it on a db.
 
-### What is this repository for? ###
+### RUN
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+To install use:
 
-### How do I get set up? ###
+`npm i`
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+To execute use:
 
-### Contribution guidelines ###
+`[OPTIONS] node server3`
 
-* Writing tests
-* Code review
-* Other guidelines
+#### OPTIONS
 
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+`LIMIT_PAGE` default `1`
