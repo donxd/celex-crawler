@@ -14,4 +14,16 @@ To execute use:
 
 #### OPTIONS
 
-`LIMIT_PAGE` default `1`
+`LIMIT_PAGE` default `1` : number of pages to process
+
+`DB`   : database config parameter
+
+`USR`  : username config parameter
+
+`HT`   : host config parameter
+
+`PT`   : port config parameter
+
+`PW`   : password config parameter
+
+`DD`   : dialect config parameter
